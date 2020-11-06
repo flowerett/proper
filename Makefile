@@ -20,7 +20,7 @@
 # Author(s):   Manolis Papadakis and Kostis Sagonas
 # Description: Instructions for make
 
-.PHONY: default all compile dialyzer check_escripts test doc clean distclean rebuild retest
+.PHONY: fmt default all compile dialyzer check_escripts test doc clean distclean rebuild retest
 
 ifneq (,$(findstring Windows,$(OS)))
     SEP := $(strip \)
@@ -60,6 +60,9 @@ endif
 
 test-examples:
 	$(REBAR3) eunit --dir=examples_test
+
+fmt:
+	$(REBAR3) fmt
 
 doc: compile
 	./scripts/make_doc

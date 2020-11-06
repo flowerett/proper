@@ -172,7 +172,7 @@
 -module(proper_fsm).
 
 -export([commands/1, commands/2, run_commands/2, run_commands/3,
-	 state_names/1]).
+         state_names/1]).
 -export([targeted_commands/1, targeted_commands/2]).
 -export([command/1, precondition/2, next_state/3, postcondition/3]).
 -export([target_states/4]).
@@ -193,17 +193,17 @@
 -type fsm_state()    :: {state_name(),state_data()}.
 -type transition()   :: {state_name(),symbolic_call()}.
 -type command()      :: {'set',symbolic_var(),symbolic_call()}
-		      | {'init',fsm_state()}.
+                      | {'init',fsm_state()}.
 -type command_list() :: [command()].
 %% @type cmd_result()
 -type cmd_result()   :: term().
 -type history()      :: [{fsm_state(),cmd_result()}].
 -type tmp_command()  :: {'init',state()}
-		      | {'set',symbolic_var(),symbolic_call()}.
+                      | {'set',symbolic_var(),symbolic_call()}.
 
 -record(state, {name :: state_name(),
-		data :: state_data(),
-		mod  :: mod_name()}).
+                data :: state_data(),
+                mod  :: mod_name()}).
 -type state() :: #state{}.
 
 
@@ -216,13 +216,13 @@
 -callback initial_state_data() -> state_data().
 
 -callback precondition(state_name(), state_name(),
-		       state_data(), symbolic_call()) -> boolean().
+                       state_data(), symbolic_call()) -> boolean().
 
 -callback postcondition(state_name(), state_name(), state_data(),
-			symbolic_call(), cmd_result()) -> boolean().
+                        symbolic_call(), cmd_result()) -> boolean().
 
 -callback next_state_data(state_name(), state_name(), state_data(),
-			  cmd_result(), symbolic_call()) -> state_data().
+                          cmd_result(), symbolic_call()) -> state_data().
 
 -callback weight(state_name(), state_name(), symbolic_call()) -> non_neg_integer().
 
@@ -242,8 +242,8 @@
 -spec commands(mod_name()) -> proper_types:type().
 commands(Mod) ->
     ?LET([_|Cmds],
-	 proper_statem:commands(?MODULE, initial_state(Mod)),
-	 Cmds).
+         proper_statem:commands(?MODULE, initial_state(Mod)),
+         Cmds).
 
 %% @doc Similar to {@link commands/1}, but generated command sequences always
 %% start at a given state. In this case, the first command is always <br/>
@@ -255,8 +255,8 @@ commands(Mod) ->
 commands(Mod, {Name,Data} = InitialState) ->
     State = #state{name = Name, data = Data, mod = Mod},
     ?LET([_|Cmds],
-	 proper_statem:commands(?MODULE, State),
-	 [{init,InitialState}|Cmds]).
+         proper_statem:commands(?MODULE, State),
+         [{init,InitialState}|Cmds]).
 
 %% @doc A special PropEr type which generates targeted command sequences,
 %% according to a finite state machine specification and taking into
@@ -267,14 +267,14 @@ commands(Mod, {Name,Data} = InitialState) ->
 
 -spec targeted_commands(mod_name()) -> proper_types:type().
 targeted_commands(Mod) ->
-  ?USERNF(commands(Mod), next_commands(Mod)).
+    ?USERNF(commands(Mod), next_commands(Mod)).
 
 next_commands(Mod) ->
-  InitialState = initial_state(Mod),
-  StatemNext = proper_statem:next_commands(?MODULE, InitialState),
-  fun (Cmds, {Depth, Temp}) ->
-      ?LET([_ | NextCmds], StatemNext(Cmds, {Depth, Temp}), NextCmds)
-  end.
+    InitialState = initial_state(Mod),
+    StatemNext = proper_statem:next_commands(?MODULE, InitialState),
+    fun (Cmds, {Depth, Temp}) ->
+            ?LET([_ | NextCmds], StatemNext(Cmds, {Depth, Temp}), NextCmds)
+    end.
 
 %% @doc Similar to {@link targeted_commands/1}, but generated command
 %% sequences always start at a given state. In this case, the first
@@ -286,15 +286,15 @@ next_commands(Mod) ->
 
 -spec targeted_commands(mod_name(), fsm_state()) -> proper_types:type().
 targeted_commands(Mod, InitialState) ->
-  ?USERNF(commands(Mod, InitialState), next_commands(Mod, InitialState)).
+    ?USERNF(commands(Mod, InitialState), next_commands(Mod, InitialState)).
 
 next_commands(Mod, {Name, Data} = InitialState) ->
-  State = #state{name = Name, data = Data, mod = Mod},
-  StatemNext = proper_statem:next_commands(?MODULE, State),
-  fun (Cmds, {Depth, Temp}) ->
-      ?LET([_ | NextCmds], StatemNext(Cmds, {Depth, Temp}),
-           [{init, InitialState} | NextCmds])
-  end.
+    State = #state{name = Name, data = Data, mod = Mod},
+    StatemNext = proper_statem:next_commands(?MODULE, State),
+    fun (Cmds, {Depth, Temp}) ->
+            ?LET([_ | NextCmds], StatemNext(Cmds, {Depth, Temp}),
+                 [{init, InitialState} | NextCmds])
+    end.
 
 %% @doc Evaluates a given symbolic command sequence `Cmds' according to the
 %% finite state machine specified in `Mod'. The result is a triple of the
@@ -302,7 +302,7 @@ next_commands(Mod, {Name, Data} = InitialState) ->
 %% {@link proper_statem:run_commands/2}.
 
 -spec run_commands(mod_name(), command_list()) ->
-         {history(),fsm_state(),fsm_result()}.
+          {history(),fsm_state(),fsm_result()}.
 run_commands(Mod, Cmds) ->
     run_commands(Mod, Cmds, []).
 
@@ -311,7 +311,7 @@ run_commands(Mod, Cmds) ->
 %% {@link proper_statem:run_commands/3}.
 
 -spec run_commands(mod_name(), command_list(), proper_symb:var_values()) ->
-         {history(),fsm_state(),fsm_result()}.
+          {history(),fsm_state(),fsm_result()}.
 run_commands(Mod, Cmds, Env) ->
     Cmds1 = tmp_commands(Mod, Cmds),
     {H,S,Res} = proper_statem:run_commands(?MODULE, Cmds1, Env),
@@ -349,18 +349,18 @@ command(#state{name = From, data = Data, mod = Mod}) ->
 precondition(#state{name = From, data = Data, mod = Mod}, Call) ->
     Targets = target_states(Mod, From, Data, Call),
     case [To || To <- Targets,
-		Mod:precondition(From, cook_history(From, To), Data, Call)] of
-	[]   ->
-	    false;
-	[_T] ->
-	    true;
-	_ ->
-	    io:format(
-	      "~nError: The transition from \"~w\" state triggered by ~w "
-	      "call leads to multiple target states.~nUse the precondition/5 "
+                Mod:precondition(From, cook_history(From, To), Data, Call)] of
+        []   ->
+            false;
+        [_T] ->
+            true;
+        _ ->
+            io:format(
+              "~nError: The transition from \"~w\" state triggered by ~w "
+              "call leads to multiple target states.~nUse the precondition/5 "
               "callback to specify which target state should be chosen.~n",
-	      [From, get_mfa(Call)]),
-	    erlang:error(too_many_targets)
+              [From, get_mfa(Call)]),
+            erlang:error(too_many_targets)
     end.
 
 %% @private
@@ -368,7 +368,7 @@ precondition(#state{name = From, data = Data, mod = Mod}, Call) ->
 next_state(S = #state{name = From, data = Data, mod = Mod} , Var, Call) ->
     To = cook_history(From, transition_target(Mod, From, Data, Call)),
     S#state{name = To,
-	    data = Mod:next_state_data(From, To, Data, Var, Call)}.
+            data = Mod:next_state_data(From, To, Data, Var, Call)}.
 
 %% @private
 -spec postcondition(state(), symbolic_call(), cmd_result()) -> boolean().
@@ -384,34 +384,34 @@ postcondition(#state{name = From, data = Data, mod = Mod}, Call, Res) ->
 -spec tmp_commands(mod_name(), command_list()) -> [tmp_command()].
 tmp_commands(Mod, Cmds) ->
     case Cmds of
-	[{init, {Name,Data}}|Rest] ->
-	    I = #state{name = Name, data = Data, mod = Mod},
-	    [{init,I}|Rest];
-	Rest ->
-	    I = initial_state(Mod),
-	    [{init,I}|Rest]
+        [{init, {Name,Data}}|Rest] ->
+            I = #state{name = Name, data = Data, mod = Mod},
+            [{init,I}|Rest];
+        Rest ->
+            I = initial_state(Mod),
+            [{init,I}|Rest]
     end.
 
 -spec get_transitions(mod_name(), state_name(), state_data()) ->
-         [transition()].
+          [transition()].
 get_transitions(Mod, StateName, Data) ->
     case StateName of
-	From when is_atom(From) ->
-	    Mod:From(Data);
-	From when is_tuple(From) ->
-	    Fun = element(1, From),
-	    Args = tl(tuple_to_list(From)),
-	    apply(Mod, Fun, Args ++ [Data])
+        From when is_atom(From) ->
+            Mod:From(Data);
+        From when is_tuple(From) ->
+            Fun = element(1, From),
+            Args = tl(tuple_to_list(From)),
+            apply(Mod, Fun, Args ++ [Data])
     end.
 
 -spec choose_transition(mod_name(), state_name(), [transition()]) ->
-         proper_types:type().
+          proper_types:type().
 choose_transition(Mod, From, T_list) ->
     case is_exported(Mod, {weight,3}) of
-	false ->
-	    choose_uniform_transition(T_list);
-	true ->
-	    choose_weighted_transition(Mod, From, T_list)
+        false ->
+            choose_uniform_transition(T_list);
+        true ->
+            choose_weighted_transition(Mod, From, T_list)
     end.
 
 -spec choose_uniform_transition([transition()]) -> proper_types:type().
@@ -420,10 +420,10 @@ choose_uniform_transition(T_list) ->
     proper_types:safe_union(List).
 
 -spec choose_weighted_transition(mod_name(), state_name(), [transition()]) ->
-         proper_types:type().
+          proper_types:type().
 choose_weighted_transition(Mod, From, T_list) ->
     List = [{Mod:weight(From, cook_history(From, To), CallGen), CallGen}
-	    || {To,CallGen} <- T_list],
+            || {To,CallGen} <- T_list],
     proper_types:safe_weighted_union(List).
 
 -spec cook_history(state_name(), state_name()) -> state_name().
@@ -435,27 +435,27 @@ is_exported(Mod, Fun) ->
     lists:member(Fun, Mod:module_info(exports)).
 
 -spec transition_target(mod_name(), state_name(), state_data(), symbolic_call()) ->
-         state_name().
+          state_name().
 transition_target(Mod, From, Data, Call) ->
     Targets = target_states(Mod, From, Data, Call),
     [To] = [T || T <- Targets,
-		 Mod:precondition(From, cook_history(From, T), Data, Call)],
+                 Mod:precondition(From, cook_history(From, T), Data, Call)],
     To.
 
 %% @private
 -spec target_states(mod_name(), state_name(), state_data(), symbolic_call()) ->
-         [state_name()].
+          [state_name()].
 target_states(Mod, From, StateData, Call) ->
     find_target(get_transitions(Mod, From, StateData), Call, []).
 
 -spec find_target([transition()], symbolic_call(), [state_name()]) ->
-         [state_name()].
+          [state_name()].
 find_target([], _, Accum) -> Accum;
 find_target(Transitions, Call, Accum) ->
     [{Target,CallGen}|Rest] = Transitions,
     case is_compatible(Call, CallGen) of
-	true  -> find_target(Rest, Call, [Target|Accum]);
-	false -> find_target(Rest, Call, Accum)
+        true  -> find_target(Rest, Call, [Target|Accum]);
+        false -> find_target(Rest, Call, Accum)
     end.
 
 -spec is_compatible(symbolic_call(), symbolic_call()) -> boolean().

@@ -33,21 +33,21 @@
 -export([init/1, callback_mode/0, basement/3, floor/3]).
 %% proper_fsm callbacks
 -export([initial_state/0, initial_state_data/0, precondition/4,
-	 next_state_data/5, postcondition/5]).
+         next_state_data/5, postcondition/5]).
 %% functions used as proper_fsm commands
 -export([up/0, down/0, which_floor/0, get_on/1, get_off/1,
-	 fsm_basement/1, fsm_floor/2]).
+         fsm_basement/1, fsm_floor/2]).
 
 -include_lib("proper/include/proper.hrl").
 
 -record(state, {floor  = 0 :: non_neg_integer(), %% current floor
-		people = 0 :: non_neg_integer(), %% people inside the elevator
-		num_floors :: non_neg_integer(), %% number of building floors
-		limit      :: pos_integer()}).   %% max number of people allowed
+                people = 0 :: non_neg_integer(), %% people inside the elevator
+                num_floors :: non_neg_integer(), %% number of building floors
+                limit      :: pos_integer()}).   %% max number of people allowed
 
 -record(test_state, {people     = 0  :: non_neg_integer(),
-		     num_floors = 5  :: non_neg_integer(),
-		     max_people = 10 :: pos_integer()}).
+                     num_floors = 5  :: non_neg_integer(),
+                     max_people = 10 :: pos_integer()}).
 
 -define(NAME, elevator).
 -define(WRAP(T), proper:test_to_outer_test(T)).
@@ -103,10 +103,10 @@ callback_mode() ->
 
 basement(cast, up, S) ->
     case S#state.num_floors > 0 of
-	true ->
-	    {next_state, floor, S#state{floor = 1}};
-	false ->
-	    {next_state, basement, S}
+        true ->
+            {next_state, floor, S#state{floor = 1}};
+        false ->
+            {next_state, basement, S}
     end;
 basement(cast, down, S) ->
     {next_state, basement, S};
@@ -120,12 +120,12 @@ basement({call,From}, {get_on,N}, S) ->
     People = S#state.people,
     MorePeople = People + N,
     case MorePeople =< S#state.limit of
-	true ->
-	    gen_statem:reply(From, MorePeople),
-	    {next_state, basement, S#state{people = MorePeople}};
-	false ->
-	    gen_statem:reply(From, People),
-	    {next_state, basement, S}
+        true ->
+            gen_statem:reply(From, MorePeople),
+            {next_state, basement, S#state{people = MorePeople}};
+        false ->
+            gen_statem:reply(From, People),
+            {next_state, basement, S}
     end;
 basement({call,From}, Msg, Data) ->
     handle_call(From, Msg, Data);
@@ -136,17 +136,17 @@ floor(cast, up, S) ->
     Floor = S#state.floor,
     NumFloors = S#state.num_floors,
     case NumFloors > Floor of
-	true ->
-	    {next_state, floor, S#state{floor = Floor + 1}};
-	false ->
-	    {next_state, floor, S}
+        true ->
+            {next_state, floor, S#state{floor = Floor + 1}};
+        false ->
+            {next_state, floor, S}
     end;
 floor(cast, down, S) ->
     case S#state.floor of
-	1 ->
-	    {next_state, basement, S#state{floor = 0}};
-	Floor when Floor > 1 ->
-	    {next_state, floor, S#state{floor = Floor-1}}
+        1 ->
+            {next_state, basement, S#state{floor = 0}};
+        Floor when Floor > 1 ->
+            {next_state, floor, S#state{floor = Floor-1}}
     end;
 floor(cast, {get_off,N}, S) ->
     People = S#state.people,
@@ -183,11 +183,11 @@ fsm_basement(S) ->
 
 fsm_floor(N, S) ->
     [{{fsm_floor,N-1},{call,?MODULE,down,[]}} || N > 1] ++
-    [{fsm_basement,{call,?MODULE,down,[]}} || N =:= 1] ++
-    [{history,{call,?MODULE,which_floor,[]}},
-     {history,{call,?MODULE,get_off,[people(S)]}},
-     {{fsm_floor,N+1},{call,?MODULE,up,[]}},
-     {history,{call,?MODULE,up,[]}}].
+        [{fsm_basement,{call,?MODULE,down,[]}} || N =:= 1] ++
+        [{history,{call,?MODULE,which_floor,[]}},
+         {history,{call,?MODULE,get_off,[people(S)]}},
+         {{fsm_floor,N+1},{call,?MODULE,up,[]}},
+         {history,{call,?MODULE,up,[]}}].
 
 precondition(fsm_basement, {fsm_floor,1}, S, {call,_,up,[]}) ->
     S#test_state.num_floors > 0;
@@ -210,8 +210,8 @@ next_state_data(_, _, S, _, {call,_,get_off,[N]}) ->
 next_state_data(_, _, S, _, {call,_,get_on,[N]}) ->
     People = S#test_state.people,
     case S#test_state.max_people < People + N of
-	true -> S;
-	false -> S#test_state{people = People + N}
+        true -> S;
+        false -> S#test_state{people = People + N}
     end;
 next_state_data(_, _, S, _, _) ->
     S.
@@ -219,8 +219,8 @@ next_state_data(_, _, S, _, _) ->
 postcondition(_, _, S, {call,_,get_on,[N]}, R) ->
     People = S#test_state.people,
     case S#test_state.max_people < People + N of
-	true -> R =:= People;
-	false -> R =:= N + People
+        true -> R =:= People;
+        false -> R =:= N + People
     end;
 postcondition(fsm_basement, fsm_basement, _, {call,_,which_floor,[]}, 0) ->
     true;
@@ -235,22 +235,22 @@ prop_elevator() ->
     ?FORALL(
        {NumFloors,MaxPeople}, {num_floors(),max_people()},
        begin
-	   Initial = {initial_state(),
-		      #test_state{num_floors = NumFloors,
-				  max_people = MaxPeople,
-				  people = 0}},
-	   ?FORALL(
-	      Cmds, more_commands(5, proper_fsm:commands(?MODULE, Initial)),
-	      begin
-		  {ok,_} = start_link({NumFloors,MaxPeople}),
-		  {H,S,Res} = proper_fsm:run_commands(?MODULE, Cmds),
-		  stop(),
-		  ?WHENFAIL(
-		     io:format("H: ~w~nS: ~w~nR: ~w~n", [H,S,Res]),
-		     aggregate(zip(proper_fsm:state_names(H),
-				   command_names(Cmds)),
-			       Res =:= ok))
-	      end)
+           Initial = {initial_state(),
+                      #test_state{num_floors = NumFloors,
+                                  max_people = MaxPeople,
+                                  people = 0}},
+           ?FORALL(
+              Cmds, more_commands(5, proper_fsm:commands(?MODULE, Initial)),
+              begin
+                  {ok,_} = start_link({NumFloors,MaxPeople}),
+                  {H,S,Res} = proper_fsm:run_commands(?MODULE, Cmds),
+                  stop(),
+                  ?WHENFAIL(
+                     io:format("H: ~w~nS: ~w~nR: ~w~n", [H,S,Res]),
+                     aggregate(zip(proper_fsm:state_names(H),
+                                   command_names(Cmds)),
+                               Res =:= ok))
+              end)
        end).
 
 people(S) ->

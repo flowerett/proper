@@ -38,24 +38,24 @@
 %% The two properties that show diff of commands/1 with more_commands/2.
 %%
 
-prop_commands_passes() ->	% This property, most likely, passes
-  ?FORALL(Cmds, commands(?MODULE),
-	  measure("Length of Cmds", length(Cmds), length(Cmds) =< 42)).
+prop_commands_passes() ->       % This property, most likely, passes
+    ?FORALL(Cmds, commands(?MODULE),
+            measure("Length of Cmds", length(Cmds), length(Cmds) =< 42)).
 
-prop_more_commands_fails() ->	% This property, most likely, fails
-  ?FORALL(Cmds, more_commands(17, commands(?MODULE) ),
-	  measure("Length of Cmds", length(Cmds), length(Cmds) =< 42)).
+prop_more_commands_fails() ->   % This property, most likely, fails
+    ?FORALL(Cmds, more_commands(17, commands(?MODULE) ),
+            measure("Length of Cmds", length(Cmds), length(Cmds) =< 42)).
 
 %%
 %% Auxiliary functions below - not important for the test
 %%
 
-command(_S) ->	% just one command suffices for this test
-  exactly({call,?MODULE,foo,[]}).
+command(_S) ->  % just one command suffices for this test
+    exactly({call,?MODULE,foo,[]}).
 
 -spec initial_state() -> 'ok'.
 initial_state() -> ok.
- 
+
 next_state(_, _, _) -> ok.
 
 precondition(_, _) -> true.

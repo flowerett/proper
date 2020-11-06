@@ -26,7 +26,7 @@
 
 -module(prec_false).
 -export([command/1, initial_state/0, next_state/3,
-	 precondition/2, postcondition/3, foo/0, bar/0]).
+         precondition/2, postcondition/3, foo/0, bar/0]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -37,7 +37,7 @@ initial_state() ->
 
 command(_S) ->
     oneof([{call,?MODULE,foo,[]},
-	   {call,?MODULE,bar,[]}]).
+           {call,?MODULE,bar,[]}]).
 
 precondition(#state{step = Step}, _) ->
     Step < 5.
@@ -53,7 +53,7 @@ bar() -> 42.
 
 prop_simple() ->
     ?FORALL(Cmds, commands(?MODULE),
-	    begin
-		{_H,_S,Res} = run_commands(?MODULE, Cmds),
-		equals(Res, ok)
-	    end).
+            begin
+                {_H,_S,Res} = run_commands(?MODULE, Cmds),
+                equals(Res, ok)
+            end).

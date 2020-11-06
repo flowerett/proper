@@ -29,10 +29,10 @@
 -module(proper_gb_trees).
 
 -export([empty/0, is_empty/1, size/1, lookup/2, get/2, insert/3,
-	 update/3, enter/3, delete/2, delete_any/2, balance/1,
-	 is_defined/2, keys/1, values/1, to_list/1, from_orddict/1,
-	 smallest/1, largest/1, take_smallest/1, take_largest/1,
-	 iterator/1, next/1, map/2]).
+         update/3, enter/3, delete/2, delete_any/2, balance/1,
+         is_defined/2, keys/1, values/1, to_list/1, from_orddict/1,
+         smallest/1, largest/1, take_smallest/1, take_largest/1,
+         iterator/1, next/1, map/2]).
 
 -export_type([gb_tree/2, iterator/2]).
 

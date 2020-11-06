@@ -24,7 +24,7 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module tests whether properties are auto-exported when including
-%%%	 proper.hrl
+%%%      proper.hrl
 
 -module(auto_export_test1).
 -export([]).

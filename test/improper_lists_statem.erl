@@ -11,7 +11,7 @@
 -behaviour(proper_statem).
 
 -export([command/1, initial_state/0, next_state/3,
-	 precondition/2, postcondition/3, foo/1]).
+         precondition/2, postcondition/3, foo/1]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -37,7 +37,7 @@ foo(_Something) ->
 
 prop_simple() ->
     ?FORALL(Cmds, commands(?MODULE),
-	    begin
-		{_H,_S,Res} = run_commands(?MODULE, Cmds),
-		equals(Res, ok)
-	    end).
+            begin
+                {_H,_S,Res} = run_commands(?MODULE, Cmds),
+                equals(Res, ok)
+            end).

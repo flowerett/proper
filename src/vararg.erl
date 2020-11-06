@@ -85,7 +85,7 @@ wrapper_clauses(MaxArity, Handler) ->
     wrapper_clauses(0, MaxArity, Handler, [], [], {nil,L}).
 
 -spec wrapper_clauses(arity(), arity(), abs_expr(), [abs_clause()],
-		      [abs_expr()], abs_expr()) -> [abs_clause(),...].
+                      [abs_expr()], abs_expr()) -> [abs_clause(),...].
 wrapper_clauses(MaxArity, MaxArity, Handler, Clauses, Args, ArgsList) ->
     FinalClause = wrapper_clause(MaxArity, Handler, Args, ArgsList),
     [FinalClause | Clauses];
@@ -99,7 +99,7 @@ wrapper_clauses(N, MaxArity, Handler, Clauses, Args, ArgsList) ->
     wrapper_clauses(N+1, MaxArity, Handler, NewClauses, NewArgs, NewArgsList).
 
 -spec wrapper_clause(arity(), abs_expr(), [abs_expr()], abs_expr()) ->
-	  abs_clause().
+          abs_clause().
 wrapper_clause(N, Handler, Args, ArgsList) ->
     L = ?anno(0),
     Body = [{call,L,Handler,[ArgsList]}],

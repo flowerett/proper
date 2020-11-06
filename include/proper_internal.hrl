@@ -46,11 +46,11 @@
 %% Stacktrace access
 %%------------------------------------------------------------------------------
 
--ifndef(OTP_RELEASE).	 %% introduced in 21
+-ifndef(OTP_RELEASE).    %% introduced in 21
 %% cases for Erlang/OTP releases prior to 21
 -define(STACKTRACE(ErrorType, Error, ErrorStackTrace),
         ErrorType:Error ->
-            ErrorStackTrace = erlang:get_stacktrace(),).
+               ErrorStackTrace = erlang:get_stacktrace(),).
 -else.  %% -if (?OTP_RELEASE >= 21).
 -define(STACKTRACE(ErrorType, Error, ErrorStackTrace),
         ErrorType:Error:ErrorStackTrace ->).
@@ -95,10 +95,10 @@
 -else.
 -type abs_rec_field() :: term().
 -endif.
--else.	% for Erlang/OTP versions prior to 21.0
+-else.  % for Erlang/OTP versions prior to 21.0
 -type abs_rec_field() :: term().
 -endif.
 
 -type loose_tuple(T) :: {} | {T} | {T,T} | {T,T,T} | {T,T,T,T} | {T,T,T,T,T}
-		      | {T,T,T,T,T,T} | {T,T,T,T,T,T,T} | {T,T,T,T,T,T,T,T}
-		      | {T,T,T,T,T,T,T,T,T} | {T,T,T,T,T,T,T,T,T,T} | tuple().
+                      | {T,T,T,T,T,T} | {T,T,T,T,T,T,T} | {T,T,T,T,T,T,T,T}
+                      | {T,T,T,T,T,T,T,T,T} | {T,T,T,T,T,T,T,T,T,T} | tuple().

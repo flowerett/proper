@@ -48,19 +48,19 @@
 %%------------------------------------------------------------------------------
 
 -record(mod_info, {name                    :: mod_name(),
-		   export_all = false      :: boolean(),
-		   funs       = sets:new() :: proper_typeserver:mod_exp_funs(),
-		   imports    = sets:new() :: proper_typeserver:mod_exp_funs(),
-		   no_autos   = sets:new() :: proper_typeserver:mod_exp_funs(),
-		   exp_types  = sets:new() :: proper_typeserver:mod_exp_types(),
-		   exp_funs   = sets:new() :: proper_typeserver:mod_exp_funs(),
-		   helper_pid              :: pid() | 'undefined'}).
+                   export_all = false      :: boolean(),
+                   funs       = sets:new() :: proper_typeserver:mod_exp_funs(),
+                   imports    = sets:new() :: proper_typeserver:mod_exp_funs(),
+                   no_autos   = sets:new() :: proper_typeserver:mod_exp_funs(),
+                   exp_types  = sets:new() :: proper_typeserver:mod_exp_types(),
+                   exp_funs   = sets:new() :: proper_typeserver:mod_exp_funs(),
+                   helper_pid              :: pid() | 'undefined'}).
 -type mod_info() :: #mod_info{}.
 
 -type exp_mod_data () :: 'nodata'
                        | {'data',
-			  proper_typeserver:mod_exp_types(),
-			  proper_typeserver:mod_exp_funs()}.
+                          proper_typeserver:mod_exp_types(),
+                          proper_typeserver:mod_exp_funs()}.
 -type exp_dict() :: dict:dict(mod_name(), exp_mod_data()).
 
 %%------------------------------------------------------------------------------
@@ -72,15 +72,15 @@
 parse_transform(Forms, Options) ->
     RawModInfo = collect_info(Forms, Options),
     #mod_info{name = ModName, export_all = ExportAll, funs = AllFuns,
-	      exp_types = ExpTypes, exp_funs = RawExpFuns} = RawModInfo,
+              exp_types = ExpTypes, exp_funs = RawExpFuns} = RawModInfo,
     {ExpFuns,PropsToExport} =
-	case ExportAll of
-	    true ->
-		{AllFuns, []};
-	    false ->
-		AllProps = sets:filter(fun is_prop/1, AllFuns),
-		{RawExpFuns, sets:to_list(sets:subtract(AllProps,RawExpFuns))}
-	end,
+        case ExportAll of
+            true ->
+                {AllFuns, []};
+            false ->
+                AllProps = sets:filter(fun is_prop/1, AllFuns),
+                {RawExpFuns, sets:to_list(sets:subtract(AllProps,RawExpFuns))}
+        end,
     HelperPid = helper_start(ModName, ExpTypes, ExpFuns),
     ModInfo = RawModInfo#mod_info{helper_pid = HelperPid},
     NewForms = [rewrite_form(F,ModInfo) || F <- Forms],
@@ -93,13 +93,13 @@ collect_info(Forms, Options) ->
     lists:foldl(fun add_info/2, StartModInfo, Forms).
 
 -spec add_options(mod_info(), compile:option() | [compile:option()]) ->
-	  mod_info().
+          mod_info().
 add_options(ModInfo, []) ->
     ModInfo;
 add_options(ModInfo, [export_all | Rest]) ->
     add_options(ModInfo#mod_info{export_all = true}, Rest);
 add_options(#mod_info{no_autos = NoAutos} = ModInfo,
-	    [{no_auto_import,FunsList} | Rest]) ->
+            [{no_auto_import,FunsList} | Rest]) ->
     NewNoAutos = sets:union(sets:from_list(FunsList), NoAutos),
     add_options(ModInfo#mod_info{no_autos = NewNoAutos}, Rest);
 add_options(ModInfo, [_OtherOption | Rest]) ->
@@ -111,19 +111,19 @@ add_options(ModInfo, SingleOption) ->
 add_info({attribute,_Line,module,ModName}, ModInfo) ->
     ModInfo#mod_info{name = ModName};
 add_info({function,_Line,Name,Arity,_Clauses},
-	 #mod_info{funs = Funs} = ModInfo) ->
+         #mod_info{funs = Funs} = ModInfo) ->
     NewFuns = sets:add_element({Name,Arity}, Funs),
     ModInfo#mod_info{funs = NewFuns};
 add_info({attribute,_Line,import,{_FromMod,MoreImports}},
-	 #mod_info{imports = Imports} = ModInfo) ->
+         #mod_info{imports = Imports} = ModInfo) ->
     NewImports = sets:union(sets:from_list(MoreImports), Imports),
     ModInfo#mod_info{imports = NewImports};
 add_info({attribute,_Line,export_type,MoreExpTypes},
-	 #mod_info{exp_types = ExpTypes} = ModInfo) ->
+         #mod_info{exp_types = ExpTypes} = ModInfo) ->
     NewExpTypes = sets:union(sets:from_list(MoreExpTypes), ExpTypes),
     ModInfo#mod_info{exp_types = NewExpTypes};
 add_info({attribute,_Line,export,MoreExpFuns},
-	 #mod_info{exp_funs = ExpFuns} = ModInfo) ->
+         #mod_info{exp_funs = ExpFuns} = ModInfo) ->
     NewExpFuns = sets:union(sets:from_list(MoreExpFuns), ExpFuns),
     ModInfo#mod_info{exp_funs = NewExpFuns};
 add_info({attribute,_Line,compile,Options}, ModInfo) ->
@@ -150,7 +150,7 @@ add_exports([Form | Rest], ToExport) ->
 %%------------------------------------------------------------------------------
 
 -spec helper_start(mod_name(), proper_typeserver:mod_exp_types(),
-		   proper_typeserver:mod_exp_funs()) -> pid().
+                   proper_typeserver:mod_exp_funs()) -> pid().
 helper_start(Mod, ModExpTypes, ModExpFuns) ->
     spawn(fun() -> helper_init(Mod,ModExpTypes,ModExpFuns) end).
 
@@ -163,11 +163,11 @@ helper_stop(HelperPid) ->
 is_exported_type(Mod, Call, Arity, HelperPid) ->
     HelperPid ! {is_exported_type,self(),Mod,Call,Arity},
     receive
-	Answer -> Answer
+        Answer -> Answer
     end.
 
 -spec helper_init(mod_name(), proper_typeserver:mod_exp_types(),
-		  proper_typeserver:mod_exp_funs()) -> 'ok'.
+                  proper_typeserver:mod_exp_funs()) -> 'ok'.
 helper_init(Mod, ModExpTypes, ModExpFuns) ->
     ExpDict = dict:from_list([{Mod,{data,ModExpTypes,ModExpFuns}}]),
     helper_loop(ExpDict).
@@ -175,34 +175,34 @@ helper_init(Mod, ModExpTypes, ModExpFuns) ->
 -spec helper_loop(exp_dict()) -> 'ok'.
 helper_loop(ExpDict) ->
     receive
-	stop ->
-	    ok;
-	{is_exported_type,From,Mod,Call,Arity} ->
-	    NewExpDict = add_module(Mod, ExpDict),
-	    Answer = case dict:fetch(Mod, NewExpDict) of
-			 {data,ModExpTypes,ModExpFuns} ->
-			     CallRef = {Call,Arity},
-			     not sets:is_element(CallRef, ModExpFuns)
-			     andalso sets:is_element(CallRef, ModExpTypes);
-			 nodata ->
-			     false
-		     end,
-	    From ! Answer,
-	    helper_loop(NewExpDict)
+        stop ->
+            ok;
+        {is_exported_type,From,Mod,Call,Arity} ->
+            NewExpDict = add_module(Mod, ExpDict),
+            Answer = case dict:fetch(Mod, NewExpDict) of
+                         {data,ModExpTypes,ModExpFuns} ->
+                             CallRef = {Call,Arity},
+                             not sets:is_element(CallRef, ModExpFuns)
+                                 andalso sets:is_element(CallRef, ModExpTypes);
+                         nodata ->
+                             false
+                     end,
+            From ! Answer,
+            helper_loop(NewExpDict)
     end.
 
 -spec add_module(mod_name(), exp_dict()) -> exp_dict().
 add_module(Mod, ExpDict) ->
     case dict:is_key(Mod, ExpDict) of
-	true ->
-	    ExpDict;
-	false ->
-	    case proper_typeserver:get_exp_info(Mod) of
-		{ok,ModExpTypes,ModExpFuns} ->
-		    dict:store(Mod, {data,ModExpTypes,ModExpFuns}, ExpDict);
-		{error,_Reason} ->
-		    dict:store(Mod, nodata, ExpDict)
-	    end
+        true ->
+            ExpDict;
+        false ->
+            case proper_typeserver:get_exp_info(Mod) of
+                {ok,ModExpTypes,ModExpFuns} ->
+                    dict:store(Mod, {data,ModExpTypes,ModExpFuns}, ExpDict);
+                {error,_Reason} ->
+                    dict:store(Mod, nodata, ExpDict)
+            end
     end.
 
 
@@ -272,8 +272,8 @@ rewrite_expr({record_field,Line,RecExpr,RecName,FieldName}, ModInfo) ->
 rewrite_expr({'catch',Line,Expr}, ModInfo) ->
     {'catch',Line,rewrite_expr(Expr,ModInfo)};
 rewrite_expr({call,Line,
-	      {remote,_,{atom,_,proper},{atom,_,forall}} = FunRef,
-	      [RawType,Prop]}, ModInfo) ->
+              {remote,_,{atom,_,proper},{atom,_,forall}} = FunRef,
+              [RawType,Prop]}, ModInfo) ->
     NewRawType = rewrite_type(RawType, ModInfo),
     NewProp = rewrite_expr(Prop, ModInfo),
     {call,Line,FunRef,[NewRawType,NewProp]};
@@ -359,28 +359,28 @@ rewrite_type({op,Line,'++',LeftExpr,RightExpr}, ModInfo) ->
     NewRightExpr = rewrite_type(RightExpr, ModInfo),
     {op,Line,'++',NewLeftExpr,NewRightExpr};
 rewrite_type({call,Line,{remote,_,{atom,_,Mod},{atom,_,Call}} = FunRef,
-	      Args} = Expr,
-	     #mod_info{name = ModName, helper_pid = HelperPid} = ModInfo) ->
+              Args} = Expr,
+             #mod_info{name = ModName, helper_pid = HelperPid} = ModInfo) ->
     case is_exported_type(Mod, Call, length(Args), HelperPid) of
-	true ->
-	    native_type_call(ModName, Expr);
-	false ->
-	    NewArgs = [rewrite_type(A,ModInfo) || A <- Args],
-	    {call,Line,FunRef,NewArgs}
+        true ->
+            native_type_call(ModName, Expr);
+        false ->
+            NewArgs = [rewrite_type(A,ModInfo) || A <- Args],
+            {call,Line,FunRef,NewArgs}
     end;
 rewrite_type({call,Line,{atom,_,Fun} = FunRef,Args} = Expr,
-	     #mod_info{name = ModName, funs = Funs, imports = Imports,
-		       no_autos = NoAutos} = ModInfo) ->
+             #mod_info{name = ModName, funs = Funs, imports = Imports,
+                       no_autos = NoAutos} = ModInfo) ->
     Arity = length(Args),
     CallRef = {Fun,Arity},
     case sets:is_element(CallRef,Funs) orelse sets:is_element(CallRef,Imports)
-	 orelse erl_internal:bif(Fun,Arity)
-		andalso not sets:is_element(CallRef,NoAutos) of
-	true ->
-	    NewArgs = [rewrite_type(A,ModInfo) || A <- Args],
-	    {call,Line,FunRef,NewArgs};
-	false ->
-	    native_type_call(ModName, Expr)
+        orelse erl_internal:bif(Fun,Arity)
+        andalso not sets:is_element(CallRef,NoAutos) of
+        true ->
+            NewArgs = [rewrite_type(A,ModInfo) || A <- Args],
+            {call,Line,FunRef,NewArgs};
+        false ->
+            native_type_call(ModName, Expr)
     end;
 rewrite_type(Expr, _ModInfo) ->
     Expr.

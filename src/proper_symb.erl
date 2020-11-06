@@ -142,7 +142,7 @@
 
 -module(proper_symb).
 -export([eval/1, eval/2, defined/1, well_defined/1, pretty_print/1,
-	 pretty_print/2]).
+         pretty_print/2]).
 -export([internal_eval/1, internal_well_defined/1]).
 
 -export_type([var_values/0]).
@@ -164,7 +164,7 @@
 -type handled_term() :: term().
 -type caller() :: 'user' | 'system'.
 -type call_handler() :: fun((mod_name(),fun_name(),[handled_term()]) ->
-				handled_term()).
+                                   handled_term()).
 -type term_handler() :: fun((term()) -> handled_term()).
 -type handle_info() :: {caller(),call_handler(),term_handler()}.
 
@@ -206,9 +206,9 @@ defined(SymbTerm) ->
 -spec defined(symb_term(), caller()) -> boolean().
 defined(SymbTerm, Caller) ->
     try eval([], SymbTerm, Caller) of
-	_Term -> true
+        _Term -> true
     catch
-	_Exception:_Reason -> false
+        _Exception:_Reason -> false
     end.
 
 %% @doc An attribute which can be applied to any symbolic generator `SymbType'
@@ -254,12 +254,12 @@ parse_fun(Module, Function, ArgTreeList) ->
 -spec parse_term(term()) -> abs_expr().
 parse_term(TreeList) when is_list(TreeList) ->
     {RestOfList, Acc0} =
-	case proper_arith:cut_improper_tail(TreeList) of
-	    {_ProperHead,_ImproperTail} = X -> X;
-	    ProperList -> {ProperList, erl_syntax:revert(erl_syntax:nil())}
-	end,
+        case proper_arith:cut_improper_tail(TreeList) of
+            {_ProperHead,_ImproperTail} = X -> X;
+            ProperList -> {ProperList, erl_syntax:revert(erl_syntax:nil())}
+        end,
     lists:foldr(fun(X,Acc) -> erl_syntax:revert(erl_syntax:cons(X,Acc)) end,
-		Acc0, RestOfList);
+                Acc0, RestOfList);
 parse_term(TreeTuple) when is_tuple(TreeTuple) ->
     erl_syntax:revert(erl_syntax:tuple(tuple_to_list(TreeTuple)));
 parse_term(Term) ->
@@ -273,42 +273,42 @@ parse_term(Term) ->
 
 -spec symb_walk(var_values(), symb_term(), handle_info()) -> handled_term().
 symb_walk(VarValues, {call,Mod,Fun,Args},
-	  {user,_HandleCall,_HandleTerm} = HandleInfo) ->
+          {user,_HandleCall,_HandleTerm} = HandleInfo) ->
     symb_walk_call(VarValues, Mod, Fun, Args, HandleInfo);
 symb_walk(VarValues, {'$call',Mod,Fun,Args}, HandleInfo) ->
     symb_walk_call(VarValues, Mod, Fun, Args, HandleInfo);
 symb_walk(VarValues, {var,VarId},
-	  {user,_HandleCall,HandleTerm} = HandleInfo) ->
+          {user,_HandleCall,HandleTerm} = HandleInfo) ->
     SymbWalk = fun(X) -> symb_walk(VarValues, X, HandleInfo) end,
     case lists:keyfind(VarId, 1, VarValues) of
-	{VarId,VarValue} ->
-	    %% TODO: this allows symbolic calls and vars inside var values,
-	    %%       which may result in an infinite loop, as in:
-	    %%       [{a,{call,m,f,[{var,a}]}}], {var,a}
-	    SymbWalk(VarValue);
-	false ->
-	    HandleTerm({HandleTerm(var),SymbWalk(VarId)})
+        {VarId,VarValue} ->
+            %% TODO: this allows symbolic calls and vars inside var values,
+            %%       which may result in an infinite loop, as in:
+            %%       [{a,{call,m,f,[{var,a}]}}], {var,a}
+            SymbWalk(VarValue);
+        false ->
+            HandleTerm({HandleTerm(var),SymbWalk(VarId)})
     end;
 symb_walk(VarValues, SymbTerm, HandleInfo) ->
     symb_walk_gen(VarValues, SymbTerm, HandleInfo).
 
 -spec symb_walk_call(var_values(), mod_name(), fun_name(), [symb_term()],
-		     handle_info()) -> handled_term().
+                     handle_info()) -> handled_term().
 symb_walk_call(VarValues, Mod, Fun, Args,
-	       {_Caller,HandleCall,_HandleTerm} = HandleInfo) ->
+               {_Caller,HandleCall,_HandleTerm} = HandleInfo) ->
     SymbWalk = fun(X) -> symb_walk(VarValues, X, HandleInfo) end,
     HandledArgs = [SymbWalk(A) || A <- Args],
     HandleCall(Mod, Fun, HandledArgs).
 
 -spec symb_walk_gen(var_values(), symb_term(), handle_info()) -> handled_term().
 symb_walk_gen(VarValues, SymbTerm,
-	      {_Caller,_HandleCall,HandleTerm} = HandleInfo) ->
+              {_Caller,_HandleCall,HandleTerm} = HandleInfo) ->
     SymbWalk = fun(X) -> symb_walk(VarValues, X, HandleInfo) end,
     Term = do_symb_walk_gen(SymbWalk, SymbTerm),
     HandleTerm(Term).
 
 -spec do_symb_walk_gen(fun((T) -> S), maybe_improper_list(T,T | [])) ->
-			  maybe_improper_list(S,S | []).
+          maybe_improper_list(S,S | []).
 do_symb_walk_gen(SymbWalk, SymbTerm) when is_map(SymbTerm) ->
     maps:from_list(proper_arith:safe_map(SymbWalk, maps:to_list(SymbTerm)));
 do_symb_walk_gen(SymbWalk, SymbTerm) when is_list(SymbTerm) ->

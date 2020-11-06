@@ -110,9 +110,9 @@
 %% @private
 -spec init_strategy(proper_target:search_steps()) -> sa_data().
 init_strategy(Steps) ->
-  #sa_data{k_max = Steps,
-           p = get_acceptance_function(),
-           temp_func = get_temperature_function()}.
+    #sa_data{k_max = Steps,
+             p = get_acceptance_function(),
+             temp_func = get_temperature_function()}.
 
 %% Initialize target state based on the initial generator
 %% and the neighbourhood function.
@@ -120,48 +120,48 @@ init_strategy(Steps) ->
 %% @private
 -spec init_target(proper_types:type(), proper_target:next_fun()) -> sa_target().
 init_target(First, Next) ->
-  {ok, InitialValue} = proper_gen:safe_generate(First),
-  #sa_target{first = First, next = Next, last_generated = InitialValue}.
+    {ok, InitialValue} = proper_gen:safe_generate(First),
+    #sa_target{first = First, next = Next, last_generated = InitialValue}.
 
 %% The function which generates the next instances of
 %% the targeted generator. It also updates the target state.
 
 %% @private
 -spec next(sa_target(), sa_data()) ->
-        {proper_gen:instance(), sa_target(), sa_data()}.
+          {proper_gen:instance(), sa_target(), sa_data()}.
 next(#sa_target{next = Next, last_generated = LastGen} = Target, Data) ->
-  NextGenerator = Next(LastGen, Data#sa_data.temperature),
-  {ok, Generated} = proper_gen:safe_generate(NextGenerator),
-  {Generated, Target#sa_target{current_generated = Generated}, Data}.
+    NextGenerator = Next(LastGen, Data#sa_data.temperature),
+    {ok, Generated} = proper_gen:safe_generate(NextGenerator),
+    {Generated, Target#sa_target{current_generated = Generated}, Data}.
 
 %% The function which returns the generator to use when shrinking.
 
 %% @private
 -spec get_shrinker(sa_target(), sa_data()) -> proper_types:type().
 get_shrinker(#sa_target{first = Type, current_generated = Generated}, Data) ->
-  CleanGenerated = proper_gen:clean_instance(Generated),
-  case proper_types:find_prop(user_nf, Type) of
-    {ok, NF} ->
-      NextType = NF(CleanGenerated, {1, Data#sa_data.temperature}),
-      %% Check for shrinkers provided by user with ?SHRINK macro.
-      case proper_types:find_prop(alt_gens, NextType) of
-        %% User provided ?SHRINK, so we keep it.
-        {ok, _} -> NextType;
-        %% Try to find which is the best shrinker.
-        %% We try to keep the original generator whenever possible.
+    CleanGenerated = proper_gen:clean_instance(Generated),
+    case proper_types:find_prop(user_nf, Type) of
+        {ok, NF} ->
+            NextType = NF(CleanGenerated, {1, Data#sa_data.temperature}),
+            %% Check for shrinkers provided by user with ?SHRINK macro.
+            case proper_types:find_prop(alt_gens, NextType) of
+                %% User provided ?SHRINK, so we keep it.
+                {ok, _} -> NextType;
+                %% Try to find which is the best shrinker.
+                %% We try to keep the original generator whenever possible.
+                error ->
+                    case proper_types:safe_is_instance(Generated, Type) of
+                        false ->
+                            case proper_types:safe_is_instance(CleanGenerated, Type) of
+                                true -> Type;
+                                false -> NextType
+                            end;
+                        true -> Type
+                    end
+            end;
         error ->
-          case proper_types:safe_is_instance(Generated, Type) of
-            false ->
-              case proper_types:safe_is_instance(CleanGenerated, Type) of
-                true -> Type;
-                false -> NextType
-              end;
-            true -> Type
-          end
-      end;
-    error ->
-      Type
-  end.
+            Type
+    end.
 
 %% Update state and data based on current fitness.
 %% The current generated value is accepted based on the
@@ -171,85 +171,85 @@ get_shrinker(#sa_target{first = Type, current_generated = Generated}, Data) ->
 
 %% @private
 -spec update_fitness(proper_target:fitness(), sa_target(), sa_data()) ->
-        {sa_target(), sa_data()}.
+          {sa_target(), sa_data()}.
 update_fitness(Fitness, Target, Data) ->
-  #sa_data{k_current = K_Current,
-           k_max = K_Max,
-           last_energy = Energy,
-           temperature = Temperature,
-           temp_func = TempFunc,
-           p = P} = Data,
-  case (Energy =:= null) orelse P(Energy, Fitness, Temperature) of
-    true ->
-      %% accept new state
-      proper_gen_next:update_caches(accept),
-      %% calculate new temperature
-      {NewTemperature, AdjustedK} =
-        TempFunc(Temperature,
-                 Energy,
-                 Fitness,
-                 K_Max,
-                 K_Current,
-                 true),
-      NewTarget =
-        Target#sa_target{last_generated = Target#sa_target.current_generated},
-      {NewTarget, Data#sa_data{last_energy = Fitness,
-                               last_update = 0,
-                               k_current = AdjustedK,
-                               temperature = NewTemperature}};
-    false ->
-      %% reject new state
-      proper_gen_next:update_caches(reject),
-      %% calculate new temperature
-      {NewTemperature, AdjustedK} =
-        TempFunc(Temperature,
-                 Energy,
-                 Fitness,
-                 K_Max,
-                 K_Current,
-                 false),
-      {Target, Data#sa_data{last_update = Data#sa_data.last_update + 1,
-                            k_current = AdjustedK,
-                            temperature = NewTemperature}}
-  end.
+    #sa_data{k_current = K_Current,
+             k_max = K_Max,
+             last_energy = Energy,
+             temperature = Temperature,
+             temp_func = TempFunc,
+             p = P} = Data,
+    case (Energy =:= null) orelse P(Energy, Fitness, Temperature) of
+        true ->
+            %% accept new state
+            proper_gen_next:update_caches(accept),
+            %% calculate new temperature
+            {NewTemperature, AdjustedK} =
+                TempFunc(Temperature,
+                         Energy,
+                         Fitness,
+                         K_Max,
+                         K_Current,
+                         true),
+            NewTarget =
+                Target#sa_target{last_generated = Target#sa_target.current_generated},
+            {NewTarget, Data#sa_data{last_energy = Fitness,
+                                     last_update = 0,
+                                     k_current = AdjustedK,
+                                     temperature = NewTemperature}};
+        false ->
+            %% reject new state
+            proper_gen_next:update_caches(reject),
+            %% calculate new temperature
+            {NewTemperature, AdjustedK} =
+                TempFunc(Temperature,
+                         Energy,
+                         Fitness,
+                         K_Max,
+                         K_Current,
+                         false),
+            {Target, Data#sa_data{last_update = Data#sa_data.last_update + 1,
+                                  k_current = AdjustedK,
+                                  temperature = NewTemperature}}
+    end.
 
 %% Restart the search strategy from a random input.
 
 %% @private
 -spec reset(sa_target(), sa_data()) -> {sa_target(), sa_data()}.
 reset(Target, Data) ->
-  {ok, ResetValue} = proper_gen:safe_generate(Target#sa_target.first),
-  {Target#sa_target{last_generated = ResetValue},
-   Data#sa_data{last_energy = null,
-                last_update = 0,
-                k_max = Data#sa_data.k_max - Data#sa_data.k_current,
-                k_current = 0}}.
+    {ok, ResetValue} = proper_gen:safe_generate(Target#sa_target.first),
+    {Target#sa_target{last_generated = ResetValue},
+     Data#sa_data{last_energy = null,
+                  last_update = 0,
+                  k_max = Data#sa_data.k_max - Data#sa_data.k_current,
+                  k_current = 0}}.
 
 %% -----------------------------------------------------------------------------
 %% Helpers
 %% -----------------------------------------------------------------------------
 
 acceptance_function_standard(EnergyCurrent, EnergyNew, Temperature) ->
-  case EnergyNew > EnergyCurrent of
-    true ->
-      %% always accept better results
-      true;
-    false ->
-      %% probabilistic acceptance (always between 0.0 and 0.5)
-      AcceptanceProbability =
-        try
-          %%  1 / (1 + math:exp(abs(EnergyCurrent - EnergyNew) / Temperature))
-          math:exp(-(EnergyCurrent - EnergyNew) / Temperature)
-        catch
-          error:badarith -> 0.0
-        end,
-      %% if random probability is less, accept
-      ?RANDOM_PROBABILITY < AcceptanceProbability
-  end.
+    case EnergyNew > EnergyCurrent of
+        true ->
+            %% always accept better results
+            true;
+        false ->
+            %% probabilistic acceptance (always between 0.0 and 0.5)
+            AcceptanceProbability =
+                try
+                    %%  1 / (1 + math:exp(abs(EnergyCurrent - EnergyNew) / Temperature))
+                    math:exp(-(EnergyCurrent - EnergyNew) / Temperature)
+                catch
+                    error:badarith -> 0.0
+                end,
+            %% if random probability is less, accept
+            ?RANDOM_PROBABILITY < AcceptanceProbability
+    end.
 
 acceptance_function_hillclimbing(EnergyCurrent, EnergyNew, _Temperature) ->
-  %% Hill-Climbing
-  EnergyNew > EnergyCurrent.
+    %% Hill-Climbing
+    EnergyNew > EnergyCurrent.
 
 temperature_function_standard_sa(_OldTemperature,
                                  _OldEnergyLevel,
@@ -257,29 +257,29 @@ temperature_function_standard_sa(_OldTemperature,
                                  K_Max,
                                  K_Current,
                                  _Accepted) ->
-  {1.0 - min(1, K_Current / K_Max), K_Current + 1}.
+    {1.0 - min(1, K_Current / K_Max), K_Current + 1}.
 
 get_temperature_function() ->
-  case get(proper_sa_tempfunc) of
-    default -> fun temperature_function_standard_sa/6;
-    Fun when is_function(Fun) ->
-      case proplists:lookup(arity, erlang:fun_info(Fun)) of
-        {arity, 6} -> Fun;
+    case get(proper_sa_tempfunc) of
+        default -> fun temperature_function_standard_sa/6;
+        Fun when is_function(Fun) ->
+            case proplists:lookup(arity, erlang:fun_info(Fun)) of
+                {arity, 6} -> Fun;
+                _ -> fun temperature_function_standard_sa/6
+            end;
+        undefined -> fun temperature_function_standard_sa/6;
         _ -> fun temperature_function_standard_sa/6
-      end;
-    undefined -> fun temperature_function_standard_sa/6;
-    _ -> fun temperature_function_standard_sa/6
-  end.
+    end.
 
 get_acceptance_function() ->
-  case get(proper_sa_acceptfunc) of
-    default -> fun acceptance_function_standard/3;
-    hillclimbing -> fun acceptance_function_hillclimbing/3;
-    Fun when is_function(Fun) ->
-      case proplists:lookup(arity, erlang:fun_info(Fun)) of
-        {arity, 3} -> Fun;
+    case get(proper_sa_acceptfunc) of
+        default -> fun acceptance_function_standard/3;
+        hillclimbing -> fun acceptance_function_hillclimbing/3;
+        Fun when is_function(Fun) ->
+            case proplists:lookup(arity, erlang:fun_info(Fun)) of
+                {arity, 3} -> Fun;
+                _ -> fun acceptance_function_standard/3
+            end;
+        undefined -> fun acceptance_function_standard/3;
         _ -> fun acceptance_function_standard/3
-      end;
-    undefined -> fun acceptance_function_standard/3;
-    _ -> fun acceptance_function_standard/3
-  end.
+    end.

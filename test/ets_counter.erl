@@ -29,7 +29,7 @@
 -export([ets_inc/2]).
 -export([set_up/0, clean_up/0]).  % needed by proper_tests
 -export([command/1, precondition/2, postcondition/3,
- 	 initial_state/0, next_state/3]).
+         initial_state/0, next_state/3]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -48,14 +48,14 @@
 
 prop_ets_counter() ->
     ?FORALL(Commands, parallel_commands(?MODULE),
-	    begin
-		set_up(),
-		{Seq,P,Result} = run_parallel_commands(?MODULE, Commands),
-		clean_up(),
-		?WHENFAIL(io:format("Seq: ~w\nPar: ~w\nRes: ~w\n",
-				    [Seq, P, Result]),
-			  Result =:= ok)
-	    end).
+            begin
+                set_up(),
+                {Seq,P,Result} = run_parallel_commands(?MODULE, Commands),
+                clean_up(),
+                ?WHENFAIL(io:format("Seq: ~w\nPar: ~w\nRes: ~w\n",
+                                    [Seq, P, Result]),
+                          Result =:= ok)
+            end).
 
 %% ---------------------------------------------------------------------
 
@@ -63,18 +63,18 @@ prop_ets_counter() ->
 
 ets_inc(Key, Inc) ->
     case ets:lookup(counter, Key) of
-	[] ->
-	    my_yield(), % attempts to schedule out the process here
-	    ets:insert(counter, {Key,Inc}),
-	    Inc;
-	[{Key,OldValue}] ->
-	    NewValue = OldValue + Inc,
-	    ets:insert(counter, {Key,NewValue}),
-	    NewValue
+        [] ->
+            my_yield(), % attempts to schedule out the process here
+            ets:insert(counter, {Key,Inc}),
+            Inc;
+        [{Key,OldValue}] ->
+            NewValue = OldValue + Inc,
+            ets:insert(counter, {Key,NewValue}),
+            NewValue
     end.
 
 my_yield() ->
-   timer:sleep(1).	% for OTP < 22.1 sufficed: erlang:yield().
+    timer:sleep(1).      % for OTP < 22.1 sufficed: erlang:yield().
 
 set_up() ->
     counter = ets:new(counter, [public, named_table]),
@@ -97,19 +97,19 @@ command(_S) ->
 
 postcondition(S, {call,_,ets_inc,[Key, Inc]}, Res) ->
     case proplists:is_defined(Key, S) of
-	true ->
-	    OldValue = proplists:get_value(Key, S),
-	    Res =:= OldValue + Inc;
-	false ->
-	    Res =:= Inc
+        true ->
+            OldValue = proplists:get_value(Key, S),
+            Res =:= OldValue + Inc;
+        false ->
+            Res =:= Inc
     end.
 
 next_state(S, _Res, {call,_,ets_inc,[Key, Inc]}) ->
     case proplists:is_defined(Key, S) of
-	 true ->
-	     OldValue = proplists:get_value(Key, S),
-	     NewValue = OldValue + Inc,
-	     [{Key,NewValue}|proplists:delete(Key, S)];
-	 false ->
-	     [{Key,Inc}|S]
+        true ->
+            OldValue = proplists:get_value(Key, S),
+            NewValue = OldValue + Inc,
+            [{Key,NewValue}|proplists:delete(Key, S)];
+        false ->
+            [{Key,Inc}|S]
     end.

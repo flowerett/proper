@@ -36,17 +36,17 @@
 %%----------------------
 
 prop_fun_bool() ->
-  ?FORALL({F, X}, {function(1,boolean()), any()}, is_boolean(F(X))).
+    ?FORALL({F, X}, {function(1,boolean()), any()}, is_boolean(F(X))).
 
 %%-----------------------------
 %% Properties that should fail
 %%-----------------------------
 
 prop_fun_int_int() ->
-  ?FORALL({F, X}, {function([integer()],integer()), integer()}, F(X) < 42).
+    ?FORALL({F, X}, {function([integer()],integer()), integer()}, F(X) < 42).
 
 prop_lists_map_filter() ->
-  ?FORALL({MapFun, FilterFun, List},
-	  {function([int()],any()), function([int()],bool()), list(int())},
-	  lists:map(MapFun, lists:filter(FilterFun, List)) =:=
-	    lists:filter(FilterFun, lists:map(MapFun, List))).
+    ?FORALL({MapFun, FilterFun, List},
+            {function([int()],any()), function([int()],bool()), list(int())},
+            lists:map(MapFun, lists:filter(FilterFun, List)) =:=
+                lists:filter(FilterFun, lists:map(MapFun, List))).

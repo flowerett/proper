@@ -45,13 +45,13 @@
 
 
 unique_key(S) ->
-  ?SUCHTHAT(I, integer(1, 100),
-            length(lists:filter(fun ({K, _}) -> K =:= I end, S)) =:= 0).
+    ?SUCHTHAT(I, integer(1, 100),
+              length(lists:filter(fun ({K, _}) -> K =:= I end, S)) =:= 0).
 key(S) ->
-  oneof([oneof([Key || {Key, _} <- S]),
-         unique_key(S)]).
+    oneof([oneof([Key || {Key, _} <- S]),
+           unique_key(S)]).
 value() ->
-  integer().
+    integer().
 
 initial_state() -> empty_ets.
 
@@ -62,29 +62,29 @@ precondition(_, non_empty_ets, _S, {call, ets, lookup, _}) -> true;
 precondition(_, empty_ets, _S, {call, ets, delete_all_objects, _}) -> true.
 
 next_state_data(_, _, S, _V, {call, ets, insert, [_, {Key, Value}]}) ->
-  case proplists:is_defined(Key, S) of
-    true -> lists:keyreplace(Key, 1, S, {Key, Value});
-    false -> [{Key, Value} | S]
-  end;
+    case proplists:is_defined(Key, S) of
+        true -> lists:keyreplace(Key, 1, S, {Key, Value});
+        false -> [{Key, Value} | S]
+    end;
 next_state_data(_, _, S, _V, {call, ets, lookup, _}) -> S;
 next_state_data(_, _, _S, _V, {call, ets, delete_all_objects, [_]}) -> [].
 
 postcondition(_, _, S, {call, ets, insert, [_, {Key, _Value}]}, _R) ->
-  case proplists:is_defined(Key, S) of
-    true -> true;
-    false -> length(S) + 1 < ?MAX_SIZE
-  end;
+    case proplists:is_defined(Key, S) of
+        true -> true;
+        false -> length(S) + 1 < ?MAX_SIZE
+    end;
 postcondition(_, _, S, {call, ets, lookup, [_, Key]}, R) ->
-  proplists:lookup_all(Key, S) =:= R;
+    proplists:lookup_all(Key, S) =:= R;
 postcondition(_, _, _S, _C, _R) -> true.
 
 empty_ets(S) ->
-  [{non_empty_ets, {call, ets, insert, [?TAB, {unique_key(S), value()}]}}].
+    [{non_empty_ets, {call, ets, insert, [?TAB, {unique_key(S), value()}]}}].
 
 non_empty_ets(S) ->
-  [{empty_ets, {call, ets, delete_all_objects, [?TAB]}},
-   {history, {call, ets, insert, [?TAB, {key(S), integer()}]}},
-   {history, {call, ets, lookup, [?TAB, key(S)]}}].
+    [{empty_ets, {call, ets, delete_all_objects, [?TAB]}},
+     {history, {call, ets, insert, [?TAB, {key(S), integer()}]}},
+     {history, {call, ets, lookup, [?TAB, key(S)]}}].
 
 
 %% -----------------------------------------------------------------------------
@@ -93,38 +93,38 @@ non_empty_ets(S) ->
 
 
 prop_random() ->
-  ?FORALL(Cmds, proper_fsm:commands(?MODULE),
-          begin
-            catch ets:delete(?TAB),
-            ?TAB = ets:new(?TAB, [set, public, named_table]),
-            {H, _S, Res} = proper_fsm:run_commands(?MODULE, Cmds),
-            ets:delete(?TAB),
-            aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                      Res =:= ok)
-          end).
+    ?FORALL(Cmds, proper_fsm:commands(?MODULE),
+            begin
+                catch ets:delete(?TAB),
+                ?TAB = ets:new(?TAB, [set, public, named_table]),
+                {H, _S, Res} = proper_fsm:run_commands(?MODULE, Cmds),
+                ets:delete(?TAB),
+                aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                          Res =:= ok)
+            end).
 
 prop_targeted() ->
-  ?FORALL_TARGETED(
-     Cmds, proper_fsm:targeted_commands(?MODULE),
-     begin
-       catch ets:delete(?TAB),
-       ?TAB = ets:new(?TAB, [set, public, named_table]),
-       {H, {_, S}, Res} = proper_fsm:run_commands(?MODULE, Cmds),
-       ets:delete(?TAB),
-       ?MAXIMIZE(length(S)),
-       aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                 Res =:= ok)
-     end).
+    ?FORALL_TARGETED(
+       Cmds, proper_fsm:targeted_commands(?MODULE),
+       begin
+           catch ets:delete(?TAB),
+           ?TAB = ets:new(?TAB, [set, public, named_table]),
+           {H, {_, S}, Res} = proper_fsm:run_commands(?MODULE, Cmds),
+           ets:delete(?TAB),
+           ?MAXIMIZE(length(S)),
+           aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                     Res =:= ok)
+       end).
 
 prop_targeted_init() ->
-  ?FORALL_TARGETED(
-     Cmds, proper_fsm:targeted_commands(?MODULE, {empty_ets, []}),
-     begin
-       catch ets:delete(?TAB),
-       ?TAB = ets:new(?TAB, [set, public, named_table]),
-       {H, {_, S}, Res} = proper_fsm:run_commands(?MODULE, Cmds),
-       ets:delete(?TAB),
-       ?MAXIMIZE(length(S)),
-       aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                 Res =:= ok)
-     end).
+    ?FORALL_TARGETED(
+       Cmds, proper_fsm:targeted_commands(?MODULE, {empty_ets, []}),
+       begin
+           catch ets:delete(?TAB),
+           ?TAB = ets:new(?TAB, [set, public, named_table]),
+           {H, {_, S}, Res} = proper_fsm:run_commands(?MODULE, Cmds),
+           ets:delete(?TAB),
+           ?MAXIMIZE(length(S)),
+           aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                     Res =:= ok)
+       end).

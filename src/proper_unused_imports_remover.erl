@@ -34,7 +34,7 @@
 -type imp_dict() :: dict:dict(key(), val()).
 
 -define(IMP_MODULES,
-	[proper, proper_statem, proper_symb, proper_types, proper_unicode]).
+        [proper, proper_statem, proper_symb, proper_types, proper_unicode]).
 
 -spec parse_transform([abs_form()], [compile:option()]) -> [abs_form()].
 parse_transform(Forms, Options) ->
@@ -104,7 +104,7 @@ to_dict([], Dict) ->
     Dict;
 to_dict([{attribute, Line, import, {Mod, FunL}} | Rest], Dict0) ->
     to_dict(Rest, lists:foldl(fun(Fun, Dict) ->
-                                  dict:store(Fun, {Line, Mod, false}, Dict)
+                                      dict:store(Fun, {Line, Mod, false}, Dict)
                               end, Dict0, FunL)).
 
 -spec new_import_attributes(imp_dict()) -> [abs_form()].

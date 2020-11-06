@@ -24,7 +24,7 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module tests whether auto-exporting is disabled when compiling
-%%%	 with PROPER_NO_TRANS enabled.
+%%%      with PROPER_NO_TRANS enabled.
 
 -module(auto_export_test2).
 
@@ -35,4 +35,4 @@
 -include_lib("proper/include/proper.hrl").
 
 prop_1() ->
-  ?FORALL(_, integer(), true).
+    ?FORALL(_, integer(), true).

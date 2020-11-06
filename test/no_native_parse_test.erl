@@ -24,7 +24,7 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module tests whether parsing of native types is disabled when
-%%%	 compiling with PROPER_NO_TRANS enabled.
+%%%      compiling with PROPER_NO_TRANS enabled.
 
 -module(no_native_parse_test).
 -export([prop_1/0]).

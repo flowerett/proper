@@ -29,11 +29,11 @@
 -module(proper_array).
 
 -export([new/0, new/1, new/2, is_array/1, set/3, get/2, size/1,
-	 sparse_size/1, default/1, reset/2, to_list/1, sparse_to_list/1,
-	 from_list/1, from_list/2, to_orddict/1, sparse_to_orddict/1,
-	 from_orddict/1, from_orddict/2, map/2, sparse_map/2, foldl/3,
-	 foldr/3, sparse_foldl/3, sparse_foldr/3, fix/1, relax/1, is_fix/1,
-	 resize/1, resize/2]).
+         sparse_size/1, default/1, reset/2, to_list/1, sparse_to_list/1,
+         from_list/1, from_list/2, to_orddict/1, sparse_to_orddict/1,
+         from_orddict/1, from_orddict/2, map/2, sparse_map/2, foldl/3,
+         foldr/3, sparse_foldl/3, sparse_foldr/3, fix/1, relax/1, is_fix/1,
+         resize/1, resize/2]).
 
 -export_type([array/1]).
 

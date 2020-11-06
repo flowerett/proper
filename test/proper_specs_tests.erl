@@ -42,9 +42,9 @@
          test5_exc/2,
          test6_exc_fp/2,
          test7_exc_fp/2,
-	 test_const_bitstrs/0,
-	 t0/2, t1/2, t2/2, t3/2, tp1/2, tp2/2, tp3/2,
-	 tm0/1, tm1/1, tm2/1]).
+         test_const_bitstrs/0,
+         t0/2, t1/2, t2/2, t3/2, tp1/2, tp2/2, tp3/2,
+         tm0/1, tm1/1, tm2/1]).
 
 check1_specs_test_() ->
     ?_test(?assert(check1_specs_test())).
@@ -167,8 +167,8 @@ test7_exc_fp(Class, Any) ->
 
 %% Tests constant (and quite weird) bitstr type specifications
 -spec test_const_bitstrs() ->
-    {<<_:16>>, <<_:16,_:_*0>>, <<_:16,_:_*1>>, <<_:16,_:_*3>>, <<_:8,_:_*8>>,
-     <<_:17>>, <<_:17,_:_*0>>, <<_:17,_:_*1>>, <<_:11,_:_*3>>, <<_:8,_:_*3>>}.
+          {<<_:16>>, <<_:16,_:_*0>>, <<_:16,_:_*1>>, <<_:16,_:_*3>>, <<_:8,_:_*8>>,
+           <<_:17>>, <<_:17,_:_*0>>, <<_:17,_:_*1>>, <<_:11,_:_*3>>, <<_:8,_:_*3>>}.
 test_const_bitstrs() ->
     Bin = <<"42">>,
     B17 = <<"42", 0:1>>,

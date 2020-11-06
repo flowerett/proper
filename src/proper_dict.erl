@@ -96,17 +96,17 @@ store(Key, Value, Dict) ->
     dict:store(Key, Value, Dict).
 
 %% NOTE: This is currently unacceptable - only simple variables can be used as
-%%	 ADT parameters.
+%%       ADT parameters.
 %% TODO: This is too restricting: the other values in the dictionary can be
-%%	 arbitrary, we only care that the one being appended to is a list.
+%%       arbitrary, we only care that the one being appended to is a list.
 -spec append(K, V, dict(K,[V])) -> dict(K,[V]).
 append(Key, Value, Dict) ->
     dict:append(Key, Value, Dict).
 
 %% NOTE: This is currently unacceptable - only simple variables can be used as
-%%	 ADT parameters.
+%%       ADT parameters.
 %% TODO: This is too restricting: the other values in the dictionary can be
-%%	 arbitrary, we only care that the one being appended to is a list.
+%%       arbitrary, we only care that the one being appended to is a list.
 -spec append_list(K, [V], dict(K,[V])) -> dict(K,[V]).
 append_list(Key, Values, Dict) ->
     dict:append_list(Key, Values, Dict).
@@ -120,9 +120,9 @@ update(Key, Fun, InitVal, Dict) ->
     dict:update(Key, Fun, InitVal, Dict).
 
 %% NOTE: This is currently unacceptable - only simple variables can be used as
-%%	 ADT parameters.
+%%       ADT parameters.
 %% TODO: This is too restricting: the other values in the dictionary can be
-%%	 arbitrary, we only care that the one being updated is a number.
+%%       arbitrary, we only care that the one being updated is a number.
 -spec update_counter(K, number(), dict(K,number())) -> dict(K,number()).
 update_counter(Key, Number, Dict) ->
     dict:update_counter(Key, Number, Dict).

@@ -28,16 +28,16 @@
 -module(mastermind).
 -export([solve/3, solve/4]).
 -export([prop_all_combinations_are_produced/0,
-	 prop_all_selections_are_produced/0,
-	 prop_remove_insert_symmetry/0,
-	 prop_delete_insert_all_symmetry/0,
-	 prop_compatible_works/0,
-	 prop_io_filters_are_symmetric/0,
-	 prop_next_comb_produces_all_combinations_in_order/0,
-	 prop_all_compatibles_are_produced/0,
-	 prop_all_produced_solutions_are_valid/1,
-	 prop_secret_combination_is_not_discarded/1,
-	 prop_invalidated_instances_reject_original_secret/1]).
+         prop_all_selections_are_produced/0,
+         prop_remove_insert_symmetry/0,
+         prop_delete_insert_all_symmetry/0,
+         prop_compatible_works/0,
+         prop_io_filters_are_symmetric/0,
+         prop_next_comb_produces_all_combinations_in_order/0,
+         prop_all_compatibles_are_produced/0,
+         prop_all_produced_solutions_are_valid/1,
+         prop_secret_combination_is_not_discarded/1,
+         prop_invalidated_instances_reject_original_secret/1]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -93,30 +93,30 @@
 %% mastermind:solve(5, 10, [{"74562",0,0},{"11300",1,0}]).
 %% "18888"
 %% mastermind:solve(4, 10, [{"1234",1,0},{"0004",1,0},{"0222",0,0},{"4444",1,0},
-%%			    {"5554",1,0},{"6664",2,0},{"6784",2,2}]).
+%%                          {"5554",1,0},{"6664",2,0},{"6784",2,2}]).
 %% "6874"
 %% mastermind:solve(6, 10, [{"353523",0,5},{"294333",3,2},{"254672",2,1}]).
 %% "534332"
 %% mastermind:solve(6, 10, [{"097654",1,3},{"000465",1,1},{"011579",0,2},
-%%			    {"227496",1,3},{"347963",4,1}]).
+%%                          {"227496",1,3},{"347963",4,1}]).
 %% "467963"
 %% mastermind:solve(6, 10, [{"006892",0,2},{"115258",2,2},{"357368",2,1}]).
 %% "112365"
 %% mastermind:solve(7, 10, [{"2104767",1,3},{"3541285",3,1},{"7567128",1,4},
-%%			    {"0117285",1,4},{"1521775",2,2},{"3261781",4,0}]).
+%%                          {"0117285",1,4},{"1521775",2,2},{"3261781",4,0}]).
 %% "3570781"
 %% mastermind:solve(8, 10, [{"11244556",0,2},{"66756572",1,4},{"00026667",1,3},
-%%			    {"03663775",1,3},{"22677262",0,3},{"67568688",7,0}]).
+%%                          {"03663775",1,3},{"22677262",0,3},{"67568688",7,0}]).
 %% "67568689"
 %% mastermind:solve(8, 10, [{"21244767",3,0},{"35455685",3,1},{"75687658",2,4}]).
 %% "05258667"
 %% mastermind:solve(8, 10, [{"76897034",5,0},{"76284933",3,2}]).
 %% "06097033"
 %% mastermind:solve(9, 10, [{"345352352",0,5},{"287639433",3,2},{"276235467",5,2},
-%%			    {"523459878",0,5}]).
+%%                          {"523459878",0,5}]).
 %% "082235466"
 %% mastermind:solve(10, 10, [{"3476453523",0,5},{"2876394333",3,2},
-%%			     {"2762354672",5,2},{"5234598781",0,5}]).
+%%                           {"2762354672",5,2},{"5234598781",0,5}]).
 %% "0122374372"
 
 
@@ -143,10 +143,10 @@ all_selections(0, _List) ->
 all_selections(N, List) when N >= 1 ->
     Len = length(List),
     case N > Len of
-	true ->
-	    erlang:error(badarg);
-	false ->
-	    all_selections(N, List, Len)
+        true ->
+            erlang:error(badarg);
+        false ->
+            all_selections(N, List, Len)
     end.
 
 all_selections(1, List, _Len) ->
@@ -155,7 +155,7 @@ all_selections(_Len, List, _Len) ->
     [List];
 all_selections(Take, [Head|Tail], Len) ->
     [[Head|Rest] || Rest <- all_selections(Take - 1, Tail, Len - 1)]
-    ++ all_selections(Take, Tail, Len - 1).
+        ++ all_selections(Take, Tail, Len - 1).
 
 %% Function: all_selection_pos/2
 %% Returns all possible selections of 'N' positions from a 'Len'-length list.
@@ -220,7 +220,7 @@ all_insertions_tr(X, Front, [], Acc) ->
     [Front ++ [X] | Acc];
 all_insertions_tr(X, Front, Back = [BackHead|BackTail], Acc) ->
     all_insertions_tr(X, Front ++ [BackHead], BackTail,
-		      [Front ++ [X] ++ Back | Acc]).
+                      [Front ++ [X] ++ Back | Acc]).
 
 %% Function true_permutation/2
 %% Returns true iff two permutations of the same list have no element in the
@@ -243,7 +243,7 @@ true_permutation([_NewHead|NewTail], [_OldHead|OldTail]) ->
 %% against combination A.
 compatible(A, B, {Blacks,Whites}, Colors) ->
     correct_blacks(A, B, Blacks)
-    andalso correct_sum(A, B, Blacks + Whites, Colors).
+        andalso correct_sum(A, B, Blacks + Whites, Colors).
 
 correct_blacks([], [], 0) -> true;
 correct_blacks([], [], _N) -> false;
@@ -259,7 +259,7 @@ correct_sum(A, B, N, Colors) ->
 
 collect_freqs(Combination, Colors) ->
     lists:foldl(fun(C,F) -> inc_freq(C,F) end, lists:duplicate(Colors,0),
-		Combination).
+                Combination).
 
 inc_freq(Color, Freqs) ->
     {H,[OldFreq | T]} = lists:split(Color, Freqs),
@@ -320,14 +320,14 @@ solve(Len, Colors, RawGuesses) ->
 solve(Len, Colors, RawGuesses, SolverName) ->
     Guesses = [{parse(RawComb),{B,W}} || {RawComb,B,W} <- RawGuesses],
     case valid_input(Len, Colors, Guesses) of
-	true  -> ok;
-	false -> erlang:error(badarg)
+        true  -> ok;
+        false -> erlang:error(badarg)
     end,
     Solver = get_solver(SolverName),
     Result = case Solver(Len, Colors, Guesses) of
-		 [] -> error;
-		 L  -> lists:min(L)
-	     end,
+                 [] -> error;
+                 L  -> lists:min(L)
+             end,
     export(Result).
 
 parse(RawComb) ->
@@ -347,20 +347,20 @@ integer_to_digit(X) when X >= 10, X =< 35 -> X - 10 + $a.
 
 valid_input(Len, Colors, Guesses) ->
     Len > 0 andalso Colors > 0
-    andalso lists:all(fun(G) -> valid_guess(Len, Colors, G) end, Guesses).
+        andalso lists:all(fun(G) -> valid_guess(Len, Colors, G) end, Guesses).
 
 valid_guess(Len, Colors, {Comb,{Blacks,Whites}}) ->
     Blacks >= 0 andalso Whites >= 0
-    andalso (Blacks + Whites < Len
-	     orelse Blacks + Whites =:= Len andalso Whites =/= 1)
-    andalso length(Comb) =:= Len
-    andalso lists:all(fun(X) -> X >= 0 andalso X =< Colors end, Comb).
+        andalso (Blacks + Whites < Len
+                 orelse Blacks + Whites =:= Len andalso Whites =/= 1)
+        andalso length(Comb) =:= Len
+        andalso lists:all(fun(X) -> X >= 0 andalso X =< Colors end, Comb).
 
 get_solver(SolverName) ->
     case SolverName of
-	simple -> fun simple_solver/3;
-	stream -> fun stream_solver/3;
-	heur   -> fun heur_solver/3
+        simple -> fun simple_solver/3;
+        stream -> fun stream_solver/3;
+        heur   -> fun heur_solver/3
     end.
 
 %% Function: simple_solver/3
@@ -395,8 +395,8 @@ stream_solver_tr(_Colors, _Guesses, done) ->
     [];
 stream_solver_tr(Colors, Guesses, Comb) ->
     case lists:all(fun({C,S}) -> compatible(C,Comb,S,Colors) end, Guesses) of
-	true  -> [Comb];
-	false -> stream_solver_tr(Colors, Guesses, next_comb(Colors,Comb))
+        true  -> [Comb];
+        false -> stream_solver_tr(Colors, Guesses, next_comb(Colors,Comb))
     end.
 
 next_comb(Colors, Comb) ->
@@ -424,7 +424,7 @@ heur_solver(Len, _Colors, []) ->
     [lists:duplicate(Len, 0)];
 heur_solver(Len, Colors, Guesses) ->
     [First|Rest] = lists:sort(fun(A,B) -> more_selective(A,B,Colors) end,
-			      Guesses),
+                              Guesses),
     Combs = all_compatibles(Len, Colors, First),
     filter_guesses(Colors, Rest, Combs).
 
@@ -437,14 +437,14 @@ heur_solver(Len, Colors, Guesses) ->
 %% The above criteria are processed in that exact order.
 more_selective({CombA,{BlacksA,WhitesA}}, {CombB,{BlacksB,WhitesB}}, Colors) ->
     case sign((BlacksA + WhitesA) - (BlacksB + WhitesB)) of
-	+1 -> true;
-	-1 -> false;
-	0  -> case sign(BlacksA - BlacksB) of
-		  +1 -> true;
-		  -1 -> false;
-		  0  -> distinct_colors(CombA, Colors)
-			=< distinct_colors(CombB, Colors)
-	      end
+        +1 -> true;
+        -1 -> false;
+        0  -> case sign(BlacksA - BlacksB) of
+                  +1 -> true;
+                  -1 -> false;
+                  0  -> distinct_colors(CombA, Colors)
+                            =< distinct_colors(CombB, Colors)
+              end
     end.
 
 sign(0)            -> 0;
@@ -460,25 +460,25 @@ distinct_colors(Comb, Colors) ->
 all_compatibles(Len, Colors, {Comb,{Blacks,Whites}}) ->
     NonFixedLen = Len - Blacks,
     [C || BlackSelPos <- all_selection_pos(Blacks, Len),
-	  C <- all_whites(NonFixedLen, Whites, Colors, Comb, BlackSelPos)].
+          C <- all_whites(NonFixedLen, Whites, Colors, Comb, BlackSelPos)].
 
 all_whites(NonFixedLen, Whites, Colors, Comb, BlackSelPos) ->
     RejectedLen = NonFixedLen - Whites,
     {NonFixed,Fixed} = remove(BlackSelPos, Comb),
     UnsortedWhiteSels =
-	[{Sel,lists:sort(Sel)} || Sel <- all_selections(Whites, NonFixed)],
+        [{Sel,lists:sort(Sel)} || Sel <- all_selections(Whites, NonFixed)],
     WhiteSels = lists:ukeysort(2, UnsortedWhiteSels),
     [insert(BlackSelPos, Fixed, C)
-	|| {WhiteSel,_} <- WhiteSels,
-	   C <- all_moves(NonFixed, WhiteSel, RejectedLen, Colors)].
+     || {WhiteSel,_} <- WhiteSels,
+        C <- all_moves(NonFixed, WhiteSel, RejectedLen, Colors)].
 
 all_moves(NonFixed, WhiteSel, RejectedLen, Colors) ->
     Rejected = delete(NonFixed, WhiteSel),
     RemainingColors = lists:seq(0,Colors-1) -- Rejected,
     AllCombs = all_combinations(RejectedLen, RemainingColors),
     UnsortedAllMoves = [L || C <- AllCombs,
-			     L <- insert_all(WhiteSel, C),
-			     true_permutation(L, NonFixed)],
+                             L <- insert_all(WhiteSel, C),
+                             true_permutation(L, NonFixed)],
     lists:usort(UnsortedAllMoves).
 
 
@@ -488,18 +488,18 @@ all_moves(NonFixed, WhiteSel, RejectedLen, Colors) ->
 
 prop_all_combinations_are_produced() ->
     ?FORALL({Len, ColorsList},
-	    {range(0,5), short_nd_list(integer())},
-	    begin
-		AllCombs = all_combinations(Len, ColorsList),
-		NumAllCombs = pow(length(ColorsList), Len),
-		lofl_check(AllCombs, NumAllCombs, Len, ColorsList)
-		andalso no_duplicates(AllCombs)
-	    end).
+            {range(0,5), short_nd_list(integer())},
+            begin
+                AllCombs = all_combinations(Len, ColorsList),
+                NumAllCombs = pow(length(ColorsList), Len),
+                lofl_check(AllCombs, NumAllCombs, Len, ColorsList)
+                    andalso no_duplicates(AllCombs)
+            end).
 
 short_nd_list(ElemType) ->
     ?LET(L,
-	 resize(7, list(ElemType)),
-	 lists:usort(L)).
+         resize(7, list(ElemType)),
+         lists:usort(L)).
 
 lofl_check(Lofl, NumLists, ListLen, ListElems) ->
     lofl_check(Lofl, NumLists, ListLen, ListElems, 0).
@@ -508,7 +508,7 @@ lofl_check([], NumLists, _ListLen, _ListElems, Acc) ->
     Acc =:= NumLists;
 lofl_check([List|Rest], NumLists, ListLen, ListElems, Acc) ->
     list_check(List, ListLen, ListElems)
-    andalso lofl_check(Rest, NumLists, ListLen, ListElems, Acc + 1).
+        andalso lofl_check(Rest, NumLists, ListLen, ListElems, Acc + 1).
 
 list_check([], 0, _Elems) ->
     true;
@@ -516,7 +516,7 @@ list_check([], _Left, _Elems) ->
     false;
 list_check([X|Rest], Left, Elems) ->
     lists:member(X, Elems)
-    andalso list_check(Rest, Left - 1, Elems).
+        andalso list_check(Rest, Left - 1, Elems).
 
 pow(X, Y) ->
     pow_tr(X, Y, 1).
@@ -530,17 +530,17 @@ no_duplicates(L) -> length(L) =:= length(lists:usort(L)).
 
 prop_all_selections_are_produced() ->
     ?FORALL(List,
-	    short_ne_list(integer()),
-	    begin
-		Len = length(List),
-		?FORALL(N,
-			range(0,Len),
-			begin
-			    AllSels = all_selections(N, List),
-			    NumAllSels = num_sels(N, Len),
-			    lofl_check(AllSels, NumAllSels, N, List)
-			end)
-	    end).
+            short_ne_list(integer()),
+            begin
+                Len = length(List),
+                ?FORALL(N,
+                        range(0,Len),
+                        begin
+                            AllSels = all_selections(N, List),
+                            NumAllSels = num_sels(N, Len),
+                            lofl_check(AllSels, NumAllSels, N, List)
+                        end)
+            end).
 
 short_list(ElemType) ->
     resize(10, list(ElemType)).
@@ -558,51 +558,51 @@ fact(N) when N >= 1 ->
 
 prop_remove_insert_symmetry() ->
     ?FORALL(List,
-	    short_ne_list(integer()),
-	    ?FORALL(Positions,
-		    pos_selection(List),
-		    begin
-			{Kept,Removed} = remove(Positions,List),
-			insert(Positions,Removed,Kept) =:= List
-		    end)).
+            short_ne_list(integer()),
+            ?FORALL(Positions,
+                    pos_selection(List),
+                    begin
+                        {Kept,Removed} = remove(Positions,List),
+                        insert(Positions,Removed,Kept) =:= List
+                    end)).
 
 pos_selection(List) ->
     Len = length(List),
     ?LET(N,
-	 range(0,Len),
-	 oneof(all_selection_pos(N, Len))).
+         range(0,Len),
+         oneof(all_selection_pos(N, Len))).
 
 prop_delete_insert_all_symmetry() ->
     ?FORALL(List,
-	    short_list(integer()),
-	    ?FORALL(Subseq,
-		    subsequence(List),
-		    lists:member(List,
-				 insert_all(Subseq,delete(List,Subseq))))).
+            short_list(integer()),
+            ?FORALL(Subseq,
+                    subsequence(List),
+                    lists:member(List,
+                                 insert_all(Subseq,delete(List,Subseq))))).
 
 subsequence(List) ->
     ?LET(L,
-	 [{X,boolean()} || X <- List],
-	 [Y || {Y,true} <- L]).
+         [{X,boolean()} || X <- List],
+         [Y || {Y,true} <- L]).
 
 prop_compatible_works() ->
     ?FORALL({Colors,A,B},
-	    two_combinations(),
-	    compatible(A, B, score(A,B), Colors)).
+            two_combinations(),
+            compatible(A, B, score(A,B), Colors)).
 
 combination(Len, Colors) ->
     vector(Len, range(0,Colors-1)).
 
 two_combinations() ->
     ?LET({Len, Colors},
-	 {range(0,30), range(1,36)},
-	 {Colors, combination(Len,Colors), combination(Len,Colors)}).
+         {range(0,30), range(1,36)},
+         {Colors, combination(Len,Colors), combination(Len,Colors)}).
 
 prop_io_filters_are_symmetric() ->
     ?FORALL(L,
-	    list(digit()),
-	    collect(num_digits(length(L)),
-		    export(parse(L)) =:= L)).
+            list(digit()),
+            collect(num_digits(length(L)),
+                    export(parse(L)) =:= L)).
 
 digit() -> union([range($0,$9), range($a,$z)]).
 
@@ -611,9 +611,9 @@ num_digits(X) when X >= 10 -> 1 + num_digits(X div 10).
 
 prop_next_comb_produces_all_combinations_in_order() ->
     ?FORALL({Len, Colors},
-	    {range(0,5), range(1,10)},
-	    list_is_produced(Colors, lists:duplicate(Len,0),
-			     all_combinations(Len,lists:seq(0,Colors-1)))).
+            {range(0,5), range(1,10)},
+            list_is_produced(Colors, lists:duplicate(Len,0),
+                             all_combinations(Len,lists:seq(0,Colors-1)))).
 
 list_is_produced(_Colors, done, []) ->
     true;
@@ -624,84 +624,84 @@ list_is_produced(_Colors, _Comb, _List) ->
 
 prop_all_compatibles_are_produced() ->
     ?FORALL({Len, Colors, Guess},
-	    one_guess_instance(),
-	    simple_solver(Len, Colors, [Guess])
-	    =:= lists:sort(all_compatibles(Len, Colors, Guess))).
+            one_guess_instance(),
+            simple_solver(Len, Colors, [Guess])
+            =:= lists:sort(all_compatibles(Len, Colors, Guess))).
 
 one_guess_instance() ->
     ?LET({Len, Colors},
-	 {range(2,5), range(2,10)},
-	 {Len, Colors, scored_guess(Len,Colors)}).
+         {range(2,5), range(2,10)},
+         {Len, Colors, scored_guess(Len,Colors)}).
 
 scored_guess(Len, Colors) ->
     ?LET(Score,
-	 valid_score(Len),
-	 {combination(Len,Colors), Score}).
+         valid_score(Len),
+         {combination(Len,Colors), Score}).
 
 valid_score(Len) ->
     ?LET(Blacks,
-	 range(0,Len),
-	 ?LET(Whites,
-	      ?SUCHTHAT(W,
-			range(0,Len-Blacks),
-			W =/= 1 orelse Blacks + W =/= Len),
-	      {Blacks,Whites})).
+         range(0,Len),
+         ?LET(Whites,
+              ?SUCHTHAT(W,
+                        range(0,Len-Blacks),
+                        W =/= 1 orelse Blacks + W =/= Len),
+              {Blacks,Whites})).
 
 prop_all_produced_solutions_are_valid(SolverName) ->
     Solver = get_solver(SolverName),
     ?FORALL({Len, Colors, Guesses},
-	    instance(),
-	    begin
-		Solutions = Solver(Len, Colors, Guesses),
-		collect(Solutions =:= [],
-			lists:all(fun(Solution) ->
-				      lists:all(fun({C,Score}) ->
-						    compatible(C,Solution,
-							       Score,Colors)
-						end,
-						Guesses)
-				  end,
-				  Solutions))
-	    end).
+            instance(),
+            begin
+                Solutions = Solver(Len, Colors, Guesses),
+                collect(Solutions =:= [],
+                        lists:all(fun(Solution) ->
+                                          lists:all(fun({C,Score}) ->
+                                                            compatible(C,Solution,
+                                                                       Score,Colors)
+                                                    end,
+                                                    Guesses)
+                                  end,
+                                  Solutions))
+            end).
 
 instance() ->
     ?LET({Len, Colors},
-	 {range(2,5), range(2,10)},
-	 {Len, Colors, short_list(scored_guess(Len,Colors))}).
+         {range(2,5), range(2,10)},
+         {Len, Colors, short_list(scored_guess(Len,Colors))}).
 
 %% Note that the next property is not necessarily true for solvers that don't
 %% return complete lists.
 prop_secret_combination_is_not_discarded(SolverName) ->
     Solver = get_solver(SolverName),
     ?FORALL({Len,Colors,Secret,Guesses},
-	    full_non_trivial_instance(),
-	    lists:member(Secret, Solver(Len,Colors,Guesses))).
+            full_non_trivial_instance(),
+            lists:member(Secret, Solver(Len,Colors,Guesses))).
 
 full_non_trivial_instance() ->
     ?LET({Len, Colors},
-	 {range(2,5), range(2,10)},
-	 ?LET({Secret, Guesses},
-	      {combination(Len,Colors), short_ne_list(combination(Len,Colors))},
-	      {Len,Colors,Secret,[{G,score(G,Secret)} || G <- Guesses]})).
+         {range(2,5), range(2,10)},
+         ?LET({Secret, Guesses},
+              {combination(Len,Colors), short_ne_list(combination(Len,Colors))},
+              {Len,Colors,Secret,[{G,score(G,Secret)} || G <- Guesses]})).
 
 prop_invalidated_instances_reject_original_secret(SolverName) ->
     Solver = get_solver(SolverName),
     ?FORALL({Len,Colors,Secret,Guesses},
-	    invalid_instance(),
-	    not lists:member(Secret, Solver(Len,Colors,Guesses))).
+            invalid_instance(),
+            not lists:member(Secret, Solver(Len,Colors,Guesses))).
 
 invalid_instance() ->
     ?LET({Len,Colors,Secret,Guesses},
-	 full_non_trivial_instance(),
-	 ?LET(Pos,
-	      range(1,length(Guesses)),
-	      begin
-		  {Comb,OldScore} = lists:nth(Pos,Guesses),
-		  ?LET(NewScore,
-		       ?SUCHTHAT(S, valid_score(Len), S =/= OldScore),
-		       {Len,Colors,Secret,
-			list_update(Pos,{Comb,NewScore},Guesses)})
-	      end)).
+         full_non_trivial_instance(),
+         ?LET(Pos,
+              range(1,length(Guesses)),
+              begin
+                  {Comb,OldScore} = lists:nth(Pos,Guesses),
+                  ?LET(NewScore,
+                       ?SUCHTHAT(S, valid_score(Len), S =/= OldScore),
+                       {Len,Colors,Secret,
+                        list_update(Pos,{Comb,NewScore},Guesses)})
+              end)).
 
 list_update(Index, NewElem, List) ->
     {H,[_OldElem | T]} = lists:split(Index - 1, List),

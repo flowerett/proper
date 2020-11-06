@@ -31,11 +31,11 @@
 -include_lib("proper/include/proper.hrl").
 
 prop_enc_dec() ->
-  ?FORALL(Msg, union([binary(), list(range(1,255))]),
-	  begin
-	    EncDecMsg = base64:decode(base64:encode(Msg)),
-	    case is_binary(Msg) of
-	      true  -> EncDecMsg =:= Msg;
-	      false -> EncDecMsg =:= list_to_binary(Msg)
-	    end
-	  end).
+    ?FORALL(Msg, union([binary(), list(range(1,255))]),
+            begin
+                EncDecMsg = base64:decode(base64:encode(Msg)),
+                case is_binary(Msg) of
+                    true  -> EncDecMsg =:= Msg;
+                    false -> EncDecMsg =:= list_to_binary(Msg)
+                end
+            end).

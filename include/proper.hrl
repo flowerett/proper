@@ -39,7 +39,7 @@
 
 -import(proper, [numtests/2, fails/1, on_output/2, conjunction/1]).
 -import(proper, [collect/2, collect/3, aggregate/2, aggregate/3, classify/3,
-		 measure/3, with_title/1, equals/2]).
+                 measure/3, with_title/1, equals/2]).
 
 
 %%------------------------------------------------------------------------------
@@ -47,9 +47,9 @@
 %%------------------------------------------------------------------------------
 
 -import(proper_types, [integer/2, float/2, atom/0, binary/0, binary/1,
-		       bitstring/0, bitstring/1, list/1, vector/2, union/1,
-		       weighted_union/1, tuple/1, loose_tuple/1, exactly/1,
-		       fixed_list/1, function/2, map/2, any/0]).
+                       bitstring/0, bitstring/1, list/1, vector/2, union/1,
+                       weighted_union/1, tuple/1, loose_tuple/1, exactly/1,
+                       fixed_list/1, function/2, map/2, any/0]).
 
 
 %%------------------------------------------------------------------------------
@@ -57,14 +57,14 @@
 %%------------------------------------------------------------------------------
 
 -import(proper_types, [integer/0, non_neg_integer/0, pos_integer/0,
-		       neg_integer/0, range/2, float/0, non_neg_float/0,
-		       number/0, boolean/0, byte/0, char/0, list/0, tuple/0,
-		       string/0, wunion/1, term/0, timeout/0, arity/0]).
+                       neg_integer/0, range/2, float/0, non_neg_float/0,
+                       number/0, boolean/0, byte/0, char/0, list/0, tuple/0,
+                       string/0, wunion/1, term/0, timeout/0, arity/0]).
 -import(proper_types, [int/0, nat/0, largeint/0, real/0, bool/0, choose/2,
-		       elements/1, oneof/1, frequency/1, return/1, default/2,
-		       orderedlist/1, function0/1, function1/1, function2/1,
-		       function3/1, function4/1, weighted_default/2, parameter/1,
-		       parameter/2, with_parameter/3, with_parameters/2]).
+                       elements/1, oneof/1, frequency/1, return/1, default/2,
+                       orderedlist/1, function0/1, function1/1, function2/1,
+                       function3/1, function4/1, weighted_default/2, parameter/1,
+                       parameter/2, with_parameter/3, with_parameters/2]).
 
 %%------------------------------------------------------------------------------
 %% Unicode
@@ -85,7 +85,7 @@
 %%------------------------------------------------------------------------------
 
 -import(proper_symb, [eval/1, eval/2, defined/1, well_defined/1, pretty_print/1,
-		      pretty_print/2]).
+                      pretty_print/2]).
 
 
 %%------------------------------------------------------------------------------
@@ -93,11 +93,11 @@
 %%------------------------------------------------------------------------------
 
 -import(proper_statem, [commands/1, commands/2, parallel_commands/1,
-			parallel_commands/2, more_commands/2]).
+                        parallel_commands/2, more_commands/2]).
 -import(proper_statem, [targeted_commands/1, targeted_commands/2]).
 -import(proper_statem, [run_commands/2, run_commands/3,  state_after/2,
-			command_names/1, zip/2, run_parallel_commands/2,
-			run_parallel_commands/3]).
+                        command_names/1, zip/2, run_parallel_commands/2,
+                        run_parallel_commands/3]).
 
 -ifndef(PROPER_NO_IMPORT_PARSE).
 -import(proper_unused_imports_remover, []).

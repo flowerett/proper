@@ -26,7 +26,7 @@
 
 -module(error_statem).
 -export([command/1, initial_state/0, next_state/3,
-	 precondition/2, postcondition/3, foo/1, bar/0]).
+         precondition/2, postcondition/3, foo/1, bar/0]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -37,7 +37,7 @@ initial_state() ->
 
 command(_S) ->
     oneof([{call,?MODULE,foo,[integer()]},
-	   {call,?MODULE,bar,[]}]).
+           {call,?MODULE,bar,[]}]).
 
 precondition(_, _) ->
     true.
@@ -50,15 +50,15 @@ postcondition(_, _, _) ->
 
 foo(I) ->
     case I > 10 of
-	false -> ok;
-	true  -> throw(badarg)
+        false -> ok;
+        true  -> throw(badarg)
     end.
 
 bar() -> 42.
 
 prop_simple() ->
     ?FORALL(Cmds, commands(?MODULE),
-	    begin
-		{_H,_S,Res} = run_commands(?MODULE, Cmds),
-		equals(Res, ok)
-	    end).
+            begin
+                {_H,_S,Res} = run_commands(?MODULE, Cmds),
+                equals(Res, ok)
+            end).

@@ -380,24 +380,24 @@
 -module(proper).
 
 -export([quickcheck/1, quickcheck/2, counterexample/1, counterexample/2,
-	 check/2, check/3, module/1, module/2, check_spec/1, check_spec/2,
-	 check_specs/1, check_specs/2]).
+         check/2, check/3, module/1, module/2, check_spec/1, check_spec/2,
+         check_specs/1, check_specs/2]).
 -export([numtests/2, fails/1, on_output/2, conjunction/1]).
 -export([collect/2, collect/3, aggregate/2, aggregate/3, classify/3, measure/3,
-	 with_title/1, equals/2]).
+         with_title/1, equals/2]).
 -export([counterexample/0, counterexamples/0]).
 -export([clean_garbage/0, global_state_erase/0]).
 -export([test_to_outer_test/1]).
 
 -export([gen_and_print_samples/3]).
 -export([get_size/1, global_state_init_size/1,
-	 global_state_init_size_seed/2, report_error/2]).
+         global_state_init_size_seed/2, report_error/2]).
 -export([pure_check/1, pure_check/2]).
 -export([forall/2, targeted/2, exists/3, implies/2,
          whenfail/2, trapexit/1, timeout/2, setup/2]).
 
 -export_type([test/0, outer_test/0, counterexample/0, exception/0,
-	      false_positive_mfas/0, setup_opts/0]).
+              false_positive_mfas/0, setup_opts/0]).
 
 -include("proper_internal.hrl").
 
@@ -419,12 +419,12 @@
 -define(END_MARKER,   "\033[00m").
 
 -define(COLOR_WRAP(NoCol, StartMarker, Msg),
-	case NoCol of
-	    true -> Msg;
-	    false -> StartMarker ++ Msg ++ ?END_MARKER
-	end).
+        case NoCol of
+            true -> Msg;
+            false -> StartMarker ++ Msg ++ ?END_MARKER
+        end).
 -define(PRINT(NoCol, StartMarker, Print, Msg, Args),
-	Print(?COLOR_WRAP(NoCol, StartMarker, Msg), Args)).
+        Print(?COLOR_WRAP(NoCol, StartMarker, Msg), Args)).
 
 
 %%-----------------------------------------------------------------------------
@@ -433,11 +433,11 @@
 
 -type imm_testcase() :: [imm_input()].
 -type imm_input() :: proper_gen:imm_instance()
-		   | {'$conjunction',sub_imm_testcases()}.
+                   | {'$conjunction',sub_imm_testcases()}.
 -type sub_imm_testcases() :: [{tag(),imm_testcase()}].
 -type imm_counterexample() :: [imm_clean_input()].
 -type imm_clean_input() :: proper_gen:instance()
-			 | {'$conjunction',sub_imm_counterexamples()}.
+                         | {'$conjunction',sub_imm_counterexamples()}.
 -type sub_imm_counterexamples() :: [{tag(),imm_counterexample()}].
 -type counterexample() :: [clean_input()].
 %% @alias
@@ -455,7 +455,7 @@
 -type tag() :: atom().
 -type title() :: atom() | string().
 -type stats_printer() :: fun((sample()) -> 'ok')
-		       | fun((sample(),output_fun()) -> 'ok').
+                       | fun((sample(),output_fun()) -> 'ok').
 %% A stats-printing function that can be passed to some of the statistics
 %% collection functions, to be used instead of the predefined stats-printer.
 %% Such a function will be called at the end of testing (in case no test fails)
@@ -467,32 +467,32 @@
 %% @type outer_test(). A testable property that has optionally been wrapped with
 %% one or more <a href="#external-wrappers">external wrappers</a>.
 -opaque outer_test() :: test()
-		      | {'fails', outer_test()}
-		      | {'setup', setup_fun(), outer_test()}
-		      | {'numtests', pos_integer(), outer_test()}
-		      | {'on_output', output_fun(), outer_test()}.
+                      | {'fails', outer_test()}
+                      | {'setup', setup_fun(), outer_test()}
+                      | {'numtests', pos_integer(), outer_test()}
+                      | {'on_output', output_fun(), outer_test()}.
 %% TODO: Should the tags be of the form '$...'?
 %% @type test(). A testable property that has not been wrapped with an
 %% <a href="#external-wrappers">external wrapper</a>.
 -opaque test() :: boolean()
-	        | {'forall', proper_types:raw_type(), dependent_test()}
-	        | {'exists', proper_types:raw_type(), dependent_test(), boolean()}
-	        | {'conjunction', [{tag(),test()}]}
-	        | {'implies', boolean(), delayed_test()}
-	        | {'sample', sample(), stats_printer(), test()}
-	        | {'whenfail', side_effects_fun(), delayed_test()}
-	        | {'trapexit', fun(() -> boolean())}
-	        | {'timeout', time_period(), fun(() -> boolean())}.
-	      %%| {'always', pos_integer(), delayed_test()}
-	      %%| {'sometimes', pos_integer(), delayed_test()}
+                | {'forall', proper_types:raw_type(), dependent_test()}
+                | {'exists', proper_types:raw_type(), dependent_test(), boolean()}
+                | {'conjunction', [{tag(),test()}]}
+                | {'implies', boolean(), delayed_test()}
+                | {'sample', sample(), stats_printer(), test()}
+                | {'whenfail', side_effects_fun(), delayed_test()}
+                | {'trapexit', fun(() -> boolean())}
+                | {'timeout', time_period(), fun(() -> boolean())}.
+%%| {'always', pos_integer(), delayed_test()}
+%%| {'sometimes', pos_integer(), delayed_test()}
 -type delayed_test() :: fun(() -> test()).
 -type dependent_test() :: fun((proper_gen:instance()) -> test()).
 -type lazy_test() :: delayed_test() | dependent_test().
 -type raw_test_kind() :: 'test' | 'spec'.
 -type raw_test() :: {'test',test()} | {'spec',mfa()}.
 -type stripped_test() :: boolean()
-		       | {proper_types:type(), dependent_test()}
-		       | [{tag(),test()}].
+                       | {proper_types:type(), dependent_test()}
+                       | [{tag(),test()}].
 -type finalize_fun() :: fun (() -> 'ok').
 -type setup_fun() :: fun(() -> finalize_fun()) | fun ((setup_opts()) -> finalize_fun()).
 
@@ -506,80 +506,80 @@
 
 %% TODO: Rename this to 'options()'?
 -type user_opt() :: 'any_to_integer'
-		  | 'fails'
-		  | 'long_result'
-		  | 'nocolors'
-		  | 'noshrink'
-		  | 'quiet'
-		  | 'verbose'
-		  | pos_integer()
-		  | {'constraint_tries',pos_integer()}
-		  | {'false_positive_mfas',false_positive_mfas()}
-		  | {'max_shrinks',non_neg_integer()}
-		  | {'max_size',proper_gen:size()}
-		  | {'numtests',pos_integer()}
-		  | {'on_output',output_fun()}
-		  | {'search_steps',pos_integer()}
-		  | {'search_strategy',proper_target:strategy()}
-		  | {'skip_mfas',[mfa()]}
-		  | {'spec_timeout',timeout()}
-		  | {'start_size',proper_gen:size()}
-		  | {'to_file',io:device()}.
+                  | 'fails'
+                  | 'long_result'
+                  | 'nocolors'
+                  | 'noshrink'
+                  | 'quiet'
+                  | 'verbose'
+                  | pos_integer()
+                  | {'constraint_tries',pos_integer()}
+                  | {'false_positive_mfas',false_positive_mfas()}
+                  | {'max_shrinks',non_neg_integer()}
+                  | {'max_size',proper_gen:size()}
+                  | {'numtests',pos_integer()}
+                  | {'on_output',output_fun()}
+                  | {'search_steps',pos_integer()}
+                  | {'search_strategy',proper_target:strategy()}
+                  | {'skip_mfas',[mfa()]}
+                  | {'spec_timeout',timeout()}
+                  | {'start_size',proper_gen:size()}
+                  | {'to_file',io:device()}.
 
 -type user_opts() :: [user_opt()] | user_opt().
 -record(opts, {output_fun       = fun io:format/2 :: output_fun(),
-	       long_result      = false           :: boolean(),
-	       numtests         = 100             :: pos_integer(),
-	       search_steps     = 1000            :: pos_integer(),
-	       search_strategy  = proper_sa       :: proper_target:strategy(),
-	       start_size       = 1               :: proper_gen:size(),
-	       seed             = os:timestamp()  :: proper_gen:seed(),
-	       max_size         = 42              :: proper_gen:size(),
-	       max_shrinks      = 500             :: non_neg_integer(),
-	       noshrink         = false           :: boolean(),
-	       constraint_tries = 50              :: pos_integer(),
-	       expect_fail      = false           :: boolean(),
-	       any_type	        :: {'type', proper_types:type()} | 'undefined',
-	       spec_timeout     = infinity        :: timeout(),
-	       skip_mfas        = []              :: [mfa()],
-	       false_positive_mfas                :: false_positive_mfas(),
-	       setup_funs       = []              :: [setup_fun()],
+               long_result      = false           :: boolean(),
+               numtests         = 100             :: pos_integer(),
+               search_steps     = 1000            :: pos_integer(),
+               search_strategy  = proper_sa       :: proper_target:strategy(),
+               start_size       = 1               :: proper_gen:size(),
+               seed             = os:timestamp()  :: proper_gen:seed(),
+               max_size         = 42              :: proper_gen:size(),
+               max_shrinks      = 500             :: non_neg_integer(),
+               noshrink         = false           :: boolean(),
+               constraint_tries = 50              :: pos_integer(),
+               expect_fail      = false           :: boolean(),
+               any_type         :: {'type', proper_types:type()} | 'undefined',
+               spec_timeout     = infinity        :: timeout(),
+               skip_mfas        = []              :: [mfa()],
+               false_positive_mfas                :: false_positive_mfas(),
+               setup_funs       = []              :: [setup_fun()],
                nocolors         = false           :: boolean()}).
 -type opts() :: #opts{}.
 -record(ctx, {mode     = new :: 'new' | 'try_shrunk' | 'try_cexm',
-	      bound    = []  :: imm_testcase() | counterexample(),
-	      actions  = []  :: fail_actions(),
-	      samples  = []  :: [sample()],
-	      printers = []  :: [stats_printer()]}).
+              bound    = []  :: imm_testcase() | counterexample(),
+              actions  = []  :: fail_actions(),
+              samples  = []  :: [sample()],
+              printers = []  :: [stats_printer()]}).
 -type ctx() :: #ctx{}.
 
 -type setup_opts() :: #{numtests := pos_integer(),
-			search_steps := pos_integer(),
-			search_strategy := proper_target:strategy(),
-			start_size := proper_gen:size(),
-			max_size := proper_gen:size(),
-			output_fun := output_fun()}.
+                        search_steps := pos_integer(),
+                        search_strategy := proper_target:strategy(),
+                        start_size := proper_gen:size(),
+                        max_size := proper_gen:size(),
+                        output_fun := output_fun()}.
 
 %%-----------------------------------------------------------------------------
 %% Result types
 %%-----------------------------------------------------------------------------
 
 -record(pass, {reason    :: pass_reason() | 'undefined',
-	       samples   :: [sample()],
-	       printers  :: [stats_printer()],
-	       performed :: pos_integer() | 'undefined',
-	       actions   :: fail_actions()}).
+               samples   :: [sample()],
+               printers  :: [stats_printer()],
+               performed :: pos_integer() | 'undefined',
+               actions   :: fail_actions()}).
 -record(fail, {reason    :: fail_reason() | 'undefined',
-	       bound     :: imm_testcase() | counterexample(),
-	       actions   :: fail_actions(),
-	       performed :: pos_integer() | 'undefined'}).
+               bound     :: imm_testcase() | counterexample(),
+               actions   :: fail_actions(),
+               performed :: pos_integer() | 'undefined'}).
 %% @alias
 -type error() :: {'error', error_reason()}.
 
 -type pass_reason() :: 'true_prop' | 'didnt_crash'.
 -type fail_reason() :: 'false_prop' | 'time_out' | {'trapped',exc_reason()}
-		     | exception() | {'sub_props',[{tag(),fail_reason()},...]}
-		     | 'exists' | 'not_found'.
+                     | exception() | {'sub_props',[{tag(),fail_reason()},...]}
+                     | 'exists' | 'not_found'.
 %% @private_type
 -type exception() :: {'exception',exc_kind(),exc_reason(),stacktrace()}.
 -type exc_kind() :: 'throw' | 'error' | 'exit'.
@@ -595,8 +595,8 @@
                       | {'unrecognized_option',term()}.
 
 -type run_result() :: #pass{performed :: 'undefined'}
-		    | #fail{performed :: 'undefined'}
-		    | error().
+                    | #fail{performed :: 'undefined'}
+                    | error().
 -type imm_result() :: #pass{reason :: 'undefined'} | #fail{} | error().
 -type long_result() :: 'true' | counterexample() | error().
 -type short_result() :: boolean() | error().
@@ -614,63 +614,63 @@
 grow_size(#opts{max_size = MaxSize} = Opts) ->
     Size = get('$size'),
     case Size < MaxSize of
-	true ->
-	    case get('$left') of
-		0 ->
-		    {ToRun, NextSize} = tests_at_next_size(Size, Opts),
-		    put('$size', NextSize),
-		    put('$left', ToRun - 1),
-		    ok;
-		Left ->
-		    put('$left', Left - 1),
-		    ok
-	    end;
-	false ->
-	    ok
+        true ->
+            case get('$left') of
+                0 ->
+                    {ToRun, NextSize} = tests_at_next_size(Size, Opts),
+                    put('$size', NextSize),
+                    put('$left', ToRun - 1),
+                    ok;
+                Left ->
+                    put('$left', Left - 1),
+                    ok
+            end;
+        false ->
+            ok
     end.
 
 -spec tests_at_next_size(proper_gen:size(), opts()) ->
-	  {pos_integer(), proper_gen:size()}.
+          {pos_integer(), proper_gen:size()}.
 tests_at_next_size(_Size, #opts{numtests = 1, start_size = StartSize}) ->
     {1, StartSize};
 tests_at_next_size(Size, #opts{numtests = NumTests, start_size = StartSize,
-			       max_size = MaxSize})
+                               max_size = MaxSize})
   when Size < MaxSize, StartSize =< MaxSize, NumTests > 1 ->
     SizesToTest = MaxSize - StartSize + 1,
     case NumTests >= SizesToTest of
-	true ->
-	    TotalOverflow = NumTests rem SizesToTest,
-	    NextSize = erlang:max(StartSize, Size + 1),
-	    Overflow = case NextSize - StartSize < TotalOverflow of
-			   true  -> 1;
-			   false -> 0
-		       end,
-	    {NumTests div SizesToTest + Overflow, NextSize};
-	false ->
-	    EverySoManySizes = (SizesToTest - 1) div (NumTests - 1),
-	    NextSize =
-		case Size < StartSize of
-		    true ->
-			StartSize;
-		    false ->
-			PrevMultiple =
-			    Size - (Size - StartSize) rem EverySoManySizes,
-			PrevMultiple + EverySoManySizes
-		end,
-	    {1, NextSize}
+        true ->
+            TotalOverflow = NumTests rem SizesToTest,
+            NextSize = erlang:max(StartSize, Size + 1),
+            Overflow = case NextSize - StartSize < TotalOverflow of
+                           true  -> 1;
+                           false -> 0
+                       end,
+            {NumTests div SizesToTest + Overflow, NextSize};
+        false ->
+            EverySoManySizes = (SizesToTest - 1) div (NumTests - 1),
+            NextSize =
+                case Size < StartSize of
+                    true ->
+                        StartSize;
+                    false ->
+                        PrevMultiple =
+                            Size - (Size - StartSize) rem EverySoManySizes,
+                        PrevMultiple + EverySoManySizes
+                end,
+            {1, NextSize}
     end.
 
 %% @private
 -spec get_size(proper_types:type()) -> proper_gen:size() | 'undefined'.
 get_size(Type) ->
     case get('$size') of
-	undefined ->
-	    undefined;
-	Size ->
-	    case proper_types:find_prop(size_transform, Type) of
-		{ok,Transform} -> Transform(Size);
-		error          -> Size
-	    end
+        undefined ->
+            undefined;
+        Size ->
+            case proper_types:find_prop(size_transform, Type) of
+                {ok,Transform} -> Transform(Size);
+                error          -> Size
+            end
     end.
 
 %% @private
@@ -685,8 +685,8 @@ global_state_init_size_seed(Size, Seed) ->
 
 -spec global_state_init(opts()) -> 'ok'.
 global_state_init(#opts{start_size = StartSize, constraint_tries = CTries,
-			search_strategy = Strategy, search_steps = SearchSteps,
-			any_type = AnyType, seed = Seed} = Opts) ->
+                        search_strategy = Strategy, search_steps = SearchSteps,
+                        any_type = AnyType, seed = Seed} = Opts) ->
     clean_garbage(),
     put('$size', StartSize - 1),
     put('$left', 0),
@@ -723,21 +723,21 @@ global_state_erase() ->
 
 -spec setup_test(opts()) -> [finalize_fun()].
 setup_test(#opts{output_fun = OutputFun,
-		 numtests = NumTests,
-		 search_steps = SearchSteps,
-		 search_strategy = Strategy,
-		 start_size = StartSize,
-		 max_size = MaxSize,
-		 setup_funs = Funs}) ->
+                 numtests = NumTests,
+                 search_steps = SearchSteps,
+                 search_strategy = Strategy,
+                 start_size = StartSize,
+                 max_size = MaxSize,
+                 setup_funs = Funs}) ->
     SetupOpts = #{numtests => NumTests,
-		  search_steps => SearchSteps,
-		  search_strategy => Strategy,
-		  start_size => StartSize,
-		  max_size => MaxSize,
-		  output_fun => OutputFun},
+                  search_steps => SearchSteps,
+                  search_strategy => Strategy,
+                  start_size => StartSize,
+                  max_size => MaxSize,
+                  output_fun => OutputFun},
     [case erlang:fun_info(Fun, arity) of
-	{arity, 0} -> Fun();
-	{arity, 1} -> Fun(SetupOpts)
+         {arity, 0} -> Fun();
+         {arity, 1} -> Fun(SetupOpts)
      end || Fun <- Funs].
 
 -spec finalize_test([finalize_fun()]) -> 'ok'.
@@ -749,10 +749,10 @@ finalize_test(Finalizers) ->
 spawn_link_migrate(ActualFun) ->
     PDictStuff = get(),
     Fun = fun() ->
-	      lists:foreach(fun({K,V}) -> put(K,V) end, PDictStuff),
-	      proper_arith:rand_reseed(),
-	      ok = ActualFun()
-	  end,
+                  lists:foreach(fun({K,V}) -> put(K,V) end, PDictStuff),
+                  proper_arith:rand_reseed(),
+                  ok = ActualFun()
+          end,
     spawn_link(Fun).
 
 -spec save_counterexample(counterexample()) -> 'ok'.
@@ -798,14 +798,14 @@ quickcheck(OuterTest) ->
 -spec quickcheck(outer_test(), user_opts()) -> result().
 quickcheck(OuterTest, UserOpts) ->
     try parse_opts(UserOpts) of
-	ImmOpts ->
-	    {Test,Opts} = peel_test(OuterTest, ImmOpts),
-	    test({test,Test}, Opts)
+        ImmOpts ->
+            {Test,Opts} = peel_test(OuterTest, ImmOpts),
+            test({test,Test}, Opts)
     catch
-	throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
-				       Err =:= unrecognized_option ->
-	    report_error(Reason, fun io:format/2),
-	    {error, Reason}
+        throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
+                                       Err =:= unrecognized_option ->
+            report_error(Reason, fun io:format/2),
+            {error, Reason}
     end.
 
 %% @equiv quickcheck(OuterTest, [long_result])
@@ -834,7 +834,7 @@ pure_check(OuterTest, ImmUserOpts) ->
     UserOpts = add_user_opt(quiet, ImmUserOpts),
     spawn_link(fun() -> Parent ! {result, quickcheck(OuterTest, UserOpts)} end),
     receive
-	{result, Result} -> Result
+        {result, Result} -> Result
     end.
 
 %% @doc Tests the accuracy of an exported function's spec.
@@ -846,13 +846,13 @@ check_spec(MFA) ->
 -spec check_spec(mfa(), user_opts()) -> result().
 check_spec(MFA, UserOpts) ->
     try parse_opts(UserOpts) of
-	Opts ->
-	    test({spec,MFA}, Opts)
+        Opts ->
+            test({spec,MFA}, Opts)
     catch
-	throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
-				       Err =:= unrecognized_option ->
-	    report_error(Reason, fun io:format/2),
-	    {error, Reason}
+        throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
+                                       Err =:= unrecognized_option ->
+            report_error(Reason, fun io:format/2),
+            {error, Reason}
     end.
 
 %% @doc Re-checks a specific counterexample `CExm' against the property
@@ -865,14 +865,14 @@ check(OuterTest, CExm) ->
 -spec check(outer_test(), counterexample(), user_opts()) -> short_result().
 check(OuterTest, CExm, UserOpts) ->
     try parse_opts(UserOpts) of
-	ImmOpts ->
-	    {Test,Opts} = peel_test(OuterTest, ImmOpts),
-	    retry(Test, CExm, Opts)
+        ImmOpts ->
+            {Test,Opts} = peel_test(OuterTest, ImmOpts),
+            retry(Test, CExm, Opts)
     catch
-	throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
-				       Err =:= unrecognized_option ->
-	    report_error(Reason, fun io:format/2),
-	    {error, Reason}
+        throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
+                                       Err =:= unrecognized_option ->
+            report_error(Reason, fun io:format/2),
+            {error, Reason}
     end.
 
 %% @doc Tests all properties (i.e., all 0-arity functions whose name begins with
@@ -898,16 +898,16 @@ check_specs(Mod, UserOpts) ->
     multi_test_prep(Mod, spec, UserOpts).
 
 -spec multi_test_prep(mod_name(), raw_test_kind(), user_opts()) ->
-	  module_result().
+          module_result().
 multi_test_prep(Mod, Kind, UserOpts) ->
     try parse_opts(UserOpts) of
-	Opts ->
-	    multi_test(Mod, Kind, Opts)
+        Opts ->
+            multi_test(Mod, Kind, Opts)
     catch
-	throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
-				       Err =:= unrecognized_option ->
-	    report_error(Reason, fun io:format/2),
-	    {error, Reason}
+        throw:{Err,_Opt} = Reason when Err =:= erroneous_option;
+                                       Err =:= unrecognized_option ->
+            report_error(Reason, fun io:format/2),
+            {error, Reason}
     end.
 
 %% @doc A type-conversion function that can be used to convert an argument of
@@ -943,60 +943,60 @@ parse_opts([UserOpt | Rest], Opts) ->
 -define(POS_INTEGER(N),     (is_integer(N) andalso N > 0)).
 -define(NON_NEG_INTEGER(N), (is_integer(N) andalso N >= 0)).
 -define(VALIDATE_OPT(Check, NewOpts),
-	try Check of
-	    true  -> NewOpts;
-	    false -> throw({erroneous_option,UserOpt})
-	catch _:_ -> throw({erroneous_option,UserOpt})
-	end).
+        try Check of
+            true  -> NewOpts;
+            false -> throw({erroneous_option,UserOpt})
+        catch _:_ -> throw({erroneous_option,UserOpt})
+        end).
 
 -spec parse_opt(user_opt(), opts()) -> opts().
 parse_opt(UserOpt, Opts) ->
     case UserOpt of
-	%% atom options, alphabetically
-	any_to_integer -> Opts#opts{any_type = {type,proper_types:integer()}};
-	fails          -> Opts#opts{expect_fail = true};
-	long_result    -> Opts#opts{long_result = true};
+        %% atom options, alphabetically
+        any_to_integer -> Opts#opts{any_type = {type,proper_types:integer()}};
+        fails          -> Opts#opts{expect_fail = true};
+        long_result    -> Opts#opts{long_result = true};
         nocolors       -> Opts#opts{nocolors = true};
-	noshrink       -> Opts#opts{noshrink = true};
-	quiet          -> Opts#opts{output_fun = fun(_,_) -> ok end};
-	verbose        -> Opts#opts{output_fun = fun io:format/2};
-	%% integer
-	N when is_integer(N) ->
-	    ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{numtests = N});
-	%% tuple options, sorted on tag
-	{constraint_tries,N} ->
-	    ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{constraint_tries = N});
-	{false_positive_mfas,F} ->
-	    ?VALIDATE_OPT(is_function(F, 3) orelse F =:= undefined,
-			  Opts#opts{false_positive_mfas = F});
-	{max_shrinks,N} ->
-	    ?VALIDATE_OPT(?NON_NEG_INTEGER(N), Opts#opts{max_shrinks = N});
-	{max_size,Size} ->
-	    ?VALIDATE_OPT(?NON_NEG_INTEGER(Size), Opts#opts{max_size = Size});
-	{numtests,N} ->
-	    ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{numtests = N});
-	{on_output,Print} ->
-	    ?VALIDATE_OPT(is_function(Print, 2),
-			  Opts#opts{output_fun = Print, nocolors = true});
-	{search_steps,N} ->
-	    ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{search_steps = N});
-	{search_strategy,S} ->
-	    ?VALIDATE_OPT(is_atom(S), Opts#opts{search_strategy = S});
-	{skip_mfas,L} ->
-	    IsMFA = fun ({M,F,A}) when is_atom(M), is_atom(F),
-				       is_integer(A), 0 =< A, A =< 255 -> true;
-			(_) -> false
-		    end,
-	    ?VALIDATE_OPT(lists:all(IsMFA, L), Opts#opts{skip_mfas = L});
-	{spec_timeout,T} ->
-	    ?VALIDATE_OPT(?NON_NEG_INTEGER(T) orelse (T =:= infinity),
-			  Opts#opts{spec_timeout = T});
-	{start_size,Size} ->
-	    ?VALIDATE_OPT(?NON_NEG_INTEGER(Size), Opts#opts{start_size = Size});
-	{to_file,IoDev} ->
-	    Opts#opts{output_fun = fun (S, F) -> io:format(IoDev, S, F) end};
-	_OTHER ->
-	    throw({unrecognized_option,UserOpt})
+        noshrink       -> Opts#opts{noshrink = true};
+        quiet          -> Opts#opts{output_fun = fun(_,_) -> ok end};
+        verbose        -> Opts#opts{output_fun = fun io:format/2};
+        %% integer
+        N when is_integer(N) ->
+            ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{numtests = N});
+        %% tuple options, sorted on tag
+        {constraint_tries,N} ->
+            ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{constraint_tries = N});
+        {false_positive_mfas,F} ->
+            ?VALIDATE_OPT(is_function(F, 3) orelse F =:= undefined,
+                          Opts#opts{false_positive_mfas = F});
+        {max_shrinks,N} ->
+            ?VALIDATE_OPT(?NON_NEG_INTEGER(N), Opts#opts{max_shrinks = N});
+        {max_size,Size} ->
+            ?VALIDATE_OPT(?NON_NEG_INTEGER(Size), Opts#opts{max_size = Size});
+        {numtests,N} ->
+            ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{numtests = N});
+        {on_output,Print} ->
+            ?VALIDATE_OPT(is_function(Print, 2),
+                          Opts#opts{output_fun = Print, nocolors = true});
+        {search_steps,N} ->
+            ?VALIDATE_OPT(?POS_INTEGER(N), Opts#opts{search_steps = N});
+        {search_strategy,S} ->
+            ?VALIDATE_OPT(is_atom(S), Opts#opts{search_strategy = S});
+        {skip_mfas,L} ->
+            IsMFA = fun ({M,F,A}) when is_atom(M), is_atom(F),
+                                       is_integer(A), 0 =< A, A =< 255 -> true;
+                        (_) -> false
+                    end,
+            ?VALIDATE_OPT(lists:all(IsMFA, L), Opts#opts{skip_mfas = L});
+        {spec_timeout,T} ->
+            ?VALIDATE_OPT(?NON_NEG_INTEGER(T) orelse (T =:= infinity),
+                          Opts#opts{spec_timeout = T});
+        {start_size,Size} ->
+            ?VALIDATE_OPT(?NON_NEG_INTEGER(Size), Opts#opts{start_size = Size});
+        {to_file,IoDev} ->
+            Opts#opts{output_fun = fun (S, F) -> io:format(IoDev, S, F) end};
+        _OTHER ->
+            throw({unrecognized_option,UserOpt})
     end.
 
 -spec peel_test(outer_test(), opts()) -> {test(),opts()}.
@@ -1057,14 +1057,14 @@ exists(RawType, DTest, Not) ->
 %% @private
 -spec targeted(proper_types:raw_type(), dependent_test()) -> outer_test().
 targeted(RawType, DTest) ->
-  setup(fun (#{numtests := Numtests} = Opts) ->
-            put('$search_steps', Numtests),
-            NewOpts = Opts#{search_steps => Numtests},
-            proper_target:init_strategy(NewOpts),
-            proper_target:init_target(RawType),
-            fun proper_target:cleanup_strategy/0
-        end,
-        forall(proper_target:targeted(RawType), DTest)).
+    setup(fun (#{numtests := Numtests} = Opts) ->
+                  put('$search_steps', Numtests),
+                  NewOpts = Opts#{search_steps => Numtests},
+                  proper_target:init_strategy(NewOpts),
+                  proper_target:init_target(RawType),
+                  fun proper_target:cleanup_strategy/0
+          end,
+          forall(proper_target:targeted(RawType), DTest)).
 
 %% @doc Returns a property that is true only if all of the sub-properties
 %% `SubProps' are true. Each sub-property should be tagged with a distinct atom.
@@ -1181,8 +1181,8 @@ inner_test(RawTest, Opts) ->
     report_imm_result(ImmResult, Opts),
     {ShortResult,LongResult} = get_result(ImmResult, Test, Opts),
     case Long of
-	true  -> LongResult;
-	false -> ShortResult
+        true  -> LongResult;
+        false -> ShortResult
     end.
 
 -spec retry(test(), counterexample(), opts()) -> short_result().
@@ -1201,45 +1201,45 @@ multi_test(Mod, RawTestKind, Opts) ->
     #opts{long_result = Long, output_fun = Print, skip_mfas = SkipMFAs} = Opts,
     global_state_init(Opts),
     MaybeMFAs =
-	case RawTestKind of
-	    test ->
-		{ok,[{Mod,Name,0} || {Name,0} <- Mod:module_info(exports),
-				     lists:prefix(?PROPERTY_PREFIX,
-						  atom_to_list(Name))]};
-	    spec ->
-		proper_typeserver:get_exp_specced(Mod)
-	end,
+        case RawTestKind of
+            test ->
+                {ok,[{Mod,Name,0} || {Name,0} <- Mod:module_info(exports),
+                                     lists:prefix(?PROPERTY_PREFIX,
+                                                  atom_to_list(Name))]};
+            spec ->
+                proper_typeserver:get_exp_specced(Mod)
+        end,
     {ShortResult, LongResult} =
-	case MaybeMFAs of
-	    {ok,MFAs} ->
-		RawLRes = [{MFA,mfa_test(MFA,RawTestKind,Opts)} || MFA <- MFAs--SkipMFAs],
-		LRes = [T || {_MFA,Res} = T <- RawLRes, is_list(Res)],
-		SRes = [MFA || {MFA,_Res} <- LRes],
-		save_counterexamples(LRes),
-		{SRes, LRes};
-	    {error,SubReason} ->
-		Reason = {typeserver,SubReason},
-		report_error(Reason, Print),
-		Error = {error,Reason},
-		{Error, Error}
-	end,
+        case MaybeMFAs of
+            {ok,MFAs} ->
+                RawLRes = [{MFA,mfa_test(MFA,RawTestKind,Opts)} || MFA <- MFAs--SkipMFAs],
+                LRes = [T || {_MFA,Res} = T <- RawLRes, is_list(Res)],
+                SRes = [MFA || {MFA,_Res} <- LRes],
+                save_counterexamples(LRes),
+                {SRes, LRes};
+            {error,SubReason} ->
+                Reason = {typeserver,SubReason},
+                report_error(Reason, Print),
+                Error = {error,Reason},
+                {Error, Error}
+        end,
     global_state_erase(),
     case Long of
-	true  -> LongResult;
-	false -> ShortResult
+        true  -> LongResult;
+        false -> ShortResult
     end.
 
 -spec mfa_test(mfa(), raw_test_kind(), opts()) -> long_result().
 mfa_test({Mod,Fun,Arity} = MFA, RawTestKind, ImmOpts) ->
     {RawTest,#opts{output_fun = Print} = Opts} =
-	case RawTestKind of
-	    test ->
-		OuterTest = Mod:Fun(),
-		{Test,FinalOpts} = peel_test(OuterTest, ImmOpts),
-		{{test,Test}, FinalOpts};
-	    spec ->
-		{{spec,MFA}, ImmOpts}
-	end,
+        case RawTestKind of
+            test ->
+                OuterTest = Mod:Fun(),
+                {Test,FinalOpts} = peel_test(OuterTest, ImmOpts),
+                {{test,Test}, FinalOpts};
+            spec ->
+                {{spec,MFA}, ImmOpts}
+        end,
     global_state_reset(Opts),
     Print("Testing ~w:~w/~b~n", [Mod,Fun,Arity]),
     Finalizers = setup_test(Opts),
@@ -1253,10 +1253,10 @@ cook_test({test,Test}, _Opts) ->
     Test;
 cook_test({spec,MFA}, #opts{spec_timeout = SpecTimeout, false_positive_mfas = FalsePositiveMFAs}) ->
     case proper_typeserver:create_spec_test(MFA, SpecTimeout, FalsePositiveMFAs) of
-	{ok,Test} ->
-	    Test;
-	{error,Reason} ->
-	    ?FORALL(_, dummy, throw({'$typeserver',Reason}))
+        {ok,Test} ->
+            Test;
+        {error,Reason} ->
+            ?FORALL(_, dummy, throw({'$typeserver',Reason}))
     end.
 
 -spec get_result(imm_result(),test(),opts()) -> {short_result(),long_result()}.
@@ -1266,13 +1266,13 @@ get_result(#fail{reason = not_found, bound=[]}, _Test, _Opts) ->
     {false, false};
 get_result(#fail{reason = Reason, bound = Bound}, Test, Opts) ->
     case shrink(Bound, Test, Reason, Opts) of
-	{ok,MinImmTestCase} ->
-	    MinTestCase = clean_testcase(MinImmTestCase),
-	    save_counterexample(MinTestCase),
-	    {false, MinTestCase};
-	{error,ErrorReason} = Error ->
-	    report_error(ErrorReason, Opts#opts.output_fun),
-	    {Error, Error}
+        {ok,MinImmTestCase} ->
+            MinTestCase = clean_testcase(MinImmTestCase),
+            save_counterexample(MinTestCase),
+            {false, MinTestCase};
+        {error,ErrorReason} = Error ->
+            report_error(ErrorReason, Opts#opts.output_fun),
+            {Error, Error}
     end;
 get_result({error,_Reason} = ErrorResult, _Test, _Opts) ->
     {ErrorResult, ErrorResult}.
@@ -1289,47 +1289,47 @@ perform(NumTests, Test, Opts) ->
     perform(0, NumTests, ?MAX_TRIES_FACTOR * NumTests, Test, none, none, Opts).
 
 -spec perform(non_neg_integer(), pos_integer(), non_neg_integer(), test(),
-	      [sample()] | 'none', [stats_printer()] | 'none', opts()) ->
-	  imm_result().
+              [sample()] | 'none', [stats_printer()] | 'none', opts()) ->
+          imm_result().
 perform(Passed, _ToPass, 0, _Test, Samples, Printers, _Opts) ->
     case Passed of
-	0 -> {error, cant_satisfy};
-	_ -> #pass{samples = Samples, printers = Printers, performed = Passed, actions = []}
+        0 -> {error, cant_satisfy};
+        _ -> #pass{samples = Samples, printers = Printers, performed = Passed, actions = []}
     end;
 perform(ToPass, ToPass, _TriesLeft, _Test, Samples, Printers, _Opts) ->
     #pass{samples = Samples, printers = Printers, performed = ToPass, actions = []};
 perform(Passed, ToPass, TriesLeft, Test, Samples, Printers,
-	#opts{output_fun = Print} = Opts) ->
+        #opts{output_fun = Print} = Opts) ->
     case run(Test, Opts) of
-	#pass{reason = true_prop, samples = MoreSamples,
-	      printers = MorePrinters} ->
-	    Print(".", []),
-	    NewSamples = add_samples(MoreSamples, Samples),
-	    NewPrinters = case Printers of
-			      none -> MorePrinters;
-			      _    -> Printers
-			  end,
-	    grow_size(Opts),
-	    perform(Passed + 1, ToPass, TriesLeft - 1, Test,
-		    NewSamples, NewPrinters, Opts);
-	#fail{} = FailResult ->
-	    Print("!", []),
-	    FailResult#fail{performed = Passed + 1};
-	{error, rejected} ->
-	    Print("x", []),
-	    grow_size(Opts),
-	    perform(Passed, ToPass, TriesLeft - 1, Test,
-		    Samples, Printers, Opts);
-	{error, Reason} = Error when Reason =:= arity_limit
-			      orelse Reason =:= non_boolean_result
-			      orelse Reason =:= type_mismatch ->
-	    Error;
-	{error, {cant_generate,_MFAs}} = Error ->
-	    Error;
-	{error, {typeserver,_SubReason}} = Error ->
-	    Error;
-	Other ->
-	    {error, {unexpected,Other}}
+        #pass{reason = true_prop, samples = MoreSamples,
+              printers = MorePrinters} ->
+            Print(".", []),
+            NewSamples = add_samples(MoreSamples, Samples),
+            NewPrinters = case Printers of
+                              none -> MorePrinters;
+                              _    -> Printers
+                          end,
+            grow_size(Opts),
+            perform(Passed + 1, ToPass, TriesLeft - 1, Test,
+                    NewSamples, NewPrinters, Opts);
+        #fail{} = FailResult ->
+            Print("!", []),
+            FailResult#fail{performed = Passed + 1};
+        {error, rejected} ->
+            Print("x", []),
+            grow_size(Opts),
+            perform(Passed, ToPass, TriesLeft - 1, Test,
+                    Samples, Printers, Opts);
+        {error, Reason} = Error when Reason =:= arity_limit
+                                     orelse Reason =:= non_boolean_result
+                                     orelse Reason =:= type_mismatch ->
+            Error;
+        {error, {cant_generate,_MFAs}} = Error ->
+            Error;
+        {error, {typeserver,_SubReason}} = Error ->
+            Error;
+        Other ->
+            {error, {unexpected,Other}}
     end.
 
 perform_search(NumSteps, Target, DTest, Ctx, Opts, Not) ->
@@ -1337,50 +1337,50 @@ perform_search(NumSteps, Target, DTest, Ctx, Opts, Not) ->
     perform_search(0, NumSteps, NumTries, Target, DTest, Ctx, Opts, Not).
 
 perform_search(_Steps, _NumSteps, 0, _Target, _Ctx, _DTest, _Opts, _Not) ->
-  {error, cant_satisfy};
+    {error, cant_satisfy};
 perform_search(NumSteps, NumSteps, _TriesLeft, _Target, _DTest, Ctx, _Opts, true) ->
     create_pass_result(Ctx, true_prop);
 perform_search(NumSteps, NumSteps, _TriesLeft, _Target, _DTest, Ctx, _Opts, false) ->
     create_fail_result(Ctx, not_found);
 perform_search(Steps, NumSteps, TriesLeft, Target, DTest,
-	       #ctx{bound = Bound} = Ctx,
-	       #opts{output_fun = Print} = Opts, Not) ->
+               #ctx{bound = Bound} = Ctx,
+               #opts{output_fun = Print} = Opts, Not) ->
     %% Search Step
     case proper_gen:safe_generate(Target) of
-	{ok, ImmInstance} ->
-	    Instance = proper_gen:clean_instance(ImmInstance),
-	    NewBound = [ImmInstance | Bound],
-	    case force(Instance, DTest, Ctx#ctx{bound = NewBound}, Opts) of
-		#pass{reason = true_prop, actions = Actions} ->
-		    %% the search is finished
-		    Print("!", []),
-		    case Not of
-			true ->
-			    NCtx = Ctx#ctx{bound = NewBound, actions = Actions},
-			    create_fail_result(NCtx, false_prop);
-			false ->
-			    create_pass_result(Ctx, true_prop)
-		    end;
-		#fail{reason = false_prop} ->
-		    Print(".", []),
-		    grow_size(Opts),
-		    perform_search(Steps + 1, NumSteps, TriesLeft - 1,
-				   Target, DTest, Ctx, Opts, Not);
-		#fail{} = FailResult -> %% TODO check that fails in the EXIST macros trigger a bug
-		    Print("!", []),
-		    FailResult#fail{performed = Steps + 1};
-		{error, rejected} ->
-		    Print("x", []),
-		    grow_size(Opts),
-		    perform_search(Steps, NumSteps, TriesLeft - 1,
-				   Target, DTest, Ctx, Opts, Not);
-		{error, _} = Error ->
-		    Error;
-		Other ->
-		    {error, {unexpected, Other}}
-	    end;
-	{error, _Reason} = Error ->
-	    Error
+        {ok, ImmInstance} ->
+            Instance = proper_gen:clean_instance(ImmInstance),
+            NewBound = [ImmInstance | Bound],
+            case force(Instance, DTest, Ctx#ctx{bound = NewBound}, Opts) of
+                #pass{reason = true_prop, actions = Actions} ->
+                    %% the search is finished
+                    Print("!", []),
+                    case Not of
+                        true ->
+                            NCtx = Ctx#ctx{bound = NewBound, actions = Actions},
+                            create_fail_result(NCtx, false_prop);
+                        false ->
+                            create_pass_result(Ctx, true_prop)
+                    end;
+                #fail{reason = false_prop} ->
+                    Print(".", []),
+                    grow_size(Opts),
+                    perform_search(Steps + 1, NumSteps, TriesLeft - 1,
+                                   Target, DTest, Ctx, Opts, Not);
+                #fail{} = FailResult -> %% TODO check that fails in the EXIST macros trigger a bug
+                    Print("!", []),
+                    FailResult#fail{performed = Steps + 1};
+                {error, rejected} ->
+                    Print("x", []),
+                    grow_size(Opts),
+                    perform_search(Steps, NumSteps, TriesLeft - 1,
+                                   Target, DTest, Ctx, Opts, Not);
+                {error, _} = Error ->
+                    Error;
+                Other ->
+                    {error, {unexpected, Other}}
+            end;
+        {error, _Reason} = Error ->
+            Error
     end.
 
 
@@ -1393,7 +1393,7 @@ add_samples(MoreSamples, Samples) ->
 
 %% Evaluated only for its side-effects.
 -spec gen_and_print_samples(proper_types:raw_type(),
-			    proper_gen:size(), proper_gen:size()) -> 'ok'.
+                            proper_gen:size(), proper_gen:size()) -> 'ok'.
 gen_and_print_samples(RawType, StartSize, EndSize) ->
     Tests = EndSize - StartSize + 1,
     Prop = ?FORALL(X, RawType, begin io:format("~p~n",[X]), true end),
@@ -1412,9 +1412,9 @@ run(Test, Opts) ->
 -spec rerun(test(), boolean(), imm_testcase() | counterexample()) -> run_result().
 rerun(Test, IsImm, ToTry) ->
     Mode = case IsImm of
-	       true  -> try_shrunk;
-	       false -> try_cexm
-	   end,
+               true  -> try_shrunk;
+               false -> try_cexm
+           end,
     Ctx = #ctx{mode = Mode, bound = ToTry},
     Opts = #opts{},
     run(Test, Ctx, Opts).
@@ -1422,13 +1422,13 @@ rerun(Test, IsImm, ToTry) ->
 -spec run(test(), ctx(), opts()) -> run_result().
 run(Result, #ctx{mode = Mode, bound = Bound} = Ctx, _Opts) when is_boolean(Result) ->
     case Mode =:= new orelse Bound =:= [] of
-	true ->
-	    case Result of
-		true  -> create_pass_result(Ctx, true_prop);
-		false -> create_fail_result(Ctx, false_prop)
-	    end;
-	false ->
-	    {error, too_many_instances}
+        true ->
+            case Result of
+                true  -> create_pass_result(Ctx, true_prop);
+                false -> create_fail_result(Ctx, false_prop)
+            end;
+        false ->
+            {error, too_many_instances}
     end;
 run({exists, RawType, Prop, Not}, #ctx{mode = new} = Ctx,
     #opts{search_strategy = Strat, search_steps = Steps,
@@ -1453,77 +1453,77 @@ run({exists, RawType, Prop, Not},
     #ctx{mode = try_shrunk, bound = [ImmInstance | Rest]} = Ctx, Opts) ->
     ShrinkerType = proper_target:get_shrinker(RawType),
     case proper_types:safe_is_instance(ImmInstance, ShrinkerType) of
-	true ->
-	    Instance = proper_gen:clean_instance(ImmInstance),
-	    case {force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts), Not} of
-		{#fail{}, true} -> create_pass_result(Ctx, true_prop);
-		{#pass{}, true} -> create_fail_result(Ctx, false_prop);
-		{R, _} -> R
-	end;
-	false ->
-	    %% TODO: could try to fix the instances here
-	    {error, wrong_type};
-	{error, _Reason} = Error ->
-	    Error
+        true ->
+            Instance = proper_gen:clean_instance(ImmInstance),
+            case {force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts), Not} of
+                {#fail{}, true} -> create_pass_result(Ctx, true_prop);
+                {#pass{}, true} -> create_fail_result(Ctx, false_prop);
+                {R, _} -> R
+            end;
+        false ->
+            %% TODO: could try to fix the instances here
+            {error, wrong_type};
+        {error, _Reason} = Error ->
+            Error
     end;
 run({exists, _RawType, Prop, Not},
     #ctx{mode = try_cexm, bound = [Instance | Rest]} = Ctx, Opts) ->
     case {force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts), Not} of
-	{#fail{}, true} -> create_pass_result(Ctx, true_prop);
-	{#pass{}, true} -> create_fail_result(Ctx, false_prop);
-	{R, _} -> R
+        {#fail{}, true} -> create_pass_result(Ctx, true_prop);
+        {#pass{}, true} -> create_fail_result(Ctx, false_prop);
+        {R, _} -> R
     end;
 run({forall, RawType, Prop}, #ctx{mode = new, bound = Bound} = Ctx, Opts) ->
     case proper_gen:safe_generate(RawType) of
-	{ok, ImmInstance} ->
-	    Instance = proper_gen:clean_instance(ImmInstance),
-	    NewCtx = Ctx#ctx{bound = [ImmInstance | Bound]},
-	    force(Instance, Prop, NewCtx, Opts);
-	{error,_Reason} = Error ->
-	    Error
+        {ok, ImmInstance} ->
+            Instance = proper_gen:clean_instance(ImmInstance),
+            NewCtx = Ctx#ctx{bound = [ImmInstance | Bound]},
+            force(Instance, Prop, NewCtx, Opts);
+        {error,_Reason} = Error ->
+            Error
     end;
 run({forall, _RawType, _Prop}, #ctx{bound = []} = Ctx, _Opts) ->
     create_pass_result(Ctx, didnt_crash);
 run({forall, RawType, Prop}, #ctx{mode = try_shrunk,
-				  bound = [ImmInstance | Rest]} = Ctx, Opts) ->
+                                  bound = [ImmInstance | Rest]} = Ctx, Opts) ->
     case proper_types:safe_is_instance(ImmInstance, RawType) of
-	true ->
-	    Instance = proper_gen:clean_instance(ImmInstance),
-	    force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts);
-	false ->
-	    %% TODO: could try to fix the instances here
-	    {error, wrong_type};
-	{error, _Reason} = Error ->
-	    Error
+        true ->
+            Instance = proper_gen:clean_instance(ImmInstance),
+            force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts);
+        false ->
+            %% TODO: could try to fix the instances here
+            {error, wrong_type};
+        {error, _Reason} = Error ->
+            Error
     end;
 run({forall, _RawType, Prop}, #ctx{mode = try_cexm,
-				   bound = [Instance | Rest]} = Ctx, Opts) ->
+                                   bound = [Instance | Rest]} = Ctx, Opts) ->
     force(Instance, Prop, Ctx#ctx{bound = Rest}, Opts);
 run({conjunction, SubProps}, #ctx{mode = new} = Ctx, Opts) ->
     run_all(SubProps, [], Ctx, Opts);
 run({conjunction, SubProps}, #ctx{mode = try_shrunk, bound = Bound} = Ctx, Opts) ->
     case Bound of
-	[] ->
-	    create_pass_result(Ctx, didnt_crash);
-	[{'$conjunction', SubImmTCs}] ->
-	    run_all(SubProps, SubImmTCs, Ctx#ctx{bound = []}, Opts);
-	_ ->
-	    {error, too_many_instances}
+        [] ->
+            create_pass_result(Ctx, didnt_crash);
+        [{'$conjunction', SubImmTCs}] ->
+            run_all(SubProps, SubImmTCs, Ctx#ctx{bound = []}, Opts);
+        _ ->
+            {error, too_many_instances}
     end;
 run({conjunction, SubProps}, #ctx{mode = try_cexm, bound = Bound} = Ctx, Opts) ->
     RealBound = case Bound of [] -> [[]]; _ -> Bound end,
     case RealBound of
-	[SubTCs] -> run_all(SubProps, SubTCs, Ctx#ctx{bound = []}, Opts);
-	_        -> {error, too_many_instances}
+        [SubTCs] -> run_all(SubProps, SubTCs, Ctx#ctx{bound = []}, Opts);
+        _        -> {error, too_many_instances}
     end;
 run({implies, true, Prop}, Ctx, Opts) ->
     force(Prop, Ctx, Opts);
 run({implies, false, _Prop}, _Ctx, _Opts) ->
     {error, rejected};
 run({sample, NewSample, NewPrinter, Prop}, #ctx{samples = Samples,
-					        printers = Printers} = Ctx, Opts) ->
+                                                printers = Printers} = Ctx, Opts) ->
     NewCtx = Ctx#ctx{samples = [NewSample | Samples],
-		     printers = [NewPrinter | Printers]},
+                     printers = [NewPrinter | Printers]},
     run(Prop, NewCtx, Opts);
 run({whenfail, NewAction, Prop}, #ctx{actions = Actions} = Ctx, Opts) ->
     NewCtx = Ctx#ctx{actions = [NewAction | Actions]},
@@ -1533,78 +1533,78 @@ run({trapexit, Prop}, Ctx, Opts) ->
     Self = self(),
     Child = spawn_link_migrate(fun() -> child(Self, Prop, Ctx, Opts) end),
     Result =
-	receive
-	    {result, RecvResult} ->
-		RecvResult;
-	    {'EXIT', Child, ExcReason} ->
-		create_fail_result(Ctx, {trapped, ExcReason})
-	end,
+        receive
+            {result, RecvResult} ->
+                RecvResult;
+            {'EXIT', Child, ExcReason} ->
+                create_fail_result(Ctx, {trapped, ExcReason})
+        end,
     true = process_flag(trap_exit, OldFlag),
     Result;
 run({timeout, Limit, Prop}, Ctx, Opts) ->
     Self = self(),
     Child = spawn_link_migrate(fun() -> child(Self, Prop, Ctx, Opts) end),
     receive
-	{result, RecvResult} -> RecvResult
+        {result, RecvResult} -> RecvResult
     after Limit ->
-	unlink(Child),
-	exit(Child, kill),
-	clear_mailbox(),
-	create_fail_result(Ctx, time_out)
+            unlink(Child),
+            exit(Child, kill),
+            clear_mailbox(),
+            create_fail_result(Ctx, time_out)
     end;
 run(_Other, _Ctx, _Opts) ->
     {error, non_boolean_result}.
 
 -spec run_all([{tag(),test()}], sub_imm_testcases() | sub_counterexamples(),
-	      ctx(), opts()) -> run_result().
+              ctx(), opts()) -> run_result().
 run_all(SubProps, Bound, Ctx, Opts) ->
     run_all(SubProps, Bound, [], Ctx, Opts).
 
 -spec run_all([{tag(),test()}], sub_imm_testcases() | sub_counterexamples(),
-	      [{tag(),fail_reason()}], ctx(), opts()) -> run_result().
+              [{tag(),fail_reason()}], ctx(), opts()) -> run_result().
 run_all([], SubBound, SubReasons, #ctx{mode = new, bound = OldBound} = Ctx, _Opts) ->
     NewBound = [{'$conjunction',lists:reverse(SubBound)} | OldBound],
     NewCtx = Ctx#ctx{bound = NewBound},
     case SubReasons of
-	[] -> create_pass_result(NewCtx, true_prop);
-	_  -> create_fail_result(NewCtx, {sub_props,lists:reverse(SubReasons)})
+        [] -> create_pass_result(NewCtx, true_prop);
+        _  -> create_fail_result(NewCtx, {sub_props,lists:reverse(SubReasons)})
     end;
 run_all([], SubBound, SubReasons, Ctx, _Opts) ->
     case {SubBound,SubReasons} of
-	{[],[]} ->
-	    create_pass_result(Ctx, true_prop);
-	{[],_ } ->
-	    create_fail_result(Ctx, {sub_props,lists:reverse(SubReasons)});
-	{_ ,_ } ->
-	    {error, too_many_instances}
+        {[],[]} ->
+            create_pass_result(Ctx, true_prop);
+        {[],_ } ->
+            create_fail_result(Ctx, {sub_props,lists:reverse(SubReasons)});
+        {_ ,_ } ->
+            {error, too_many_instances}
     end;
 run_all([{Tag,Prop}|Rest], OldSubBound, SubReasons,
-	#ctx{mode = Mode, actions = Actions, samples = Samples,
-	     printers = Printers} = Ctx, Opts) ->
+        #ctx{mode = Mode, actions = Actions, samples = Samples,
+             printers = Printers} = Ctx, Opts) ->
     {SubCtxBound,SubBound} =
-	case Mode of
-	    new -> {[], OldSubBound};
-	    _   -> {proplists:get_value(Tag, OldSubBound, []),
-		    proplists:delete(Tag, OldSubBound)}
-	end,
+        case Mode of
+            new -> {[], OldSubBound};
+            _   -> {proplists:get_value(Tag, OldSubBound, []),
+                    proplists:delete(Tag, OldSubBound)}
+        end,
     case run(Prop, #ctx{mode = Mode, bound = SubCtxBound}, Opts) of
-	#pass{samples = MoreSamples, printers = MorePrinters} ->
-	    NewSamples = lists:reverse(MoreSamples, Samples),
-	    NewPrinters = lists:reverse(MorePrinters, Printers),
-	    NewCtx = Ctx#ctx{samples = NewSamples, printers = NewPrinters},
-	    run_all(Rest, SubBound, SubReasons, NewCtx, Opts);
-	#fail{reason = Reason, bound = SubImmTC, actions = MoreActions} ->
-	    NewActions = lists:reverse(MoreActions, Actions),
-	    NewCtx = Ctx#ctx{actions = NewActions},
-	    NewSubBound =
-		case Mode of
-		    new -> [{Tag,SubImmTC}|SubBound];
-		    _   -> SubBound
-		end,
-	    NewSubReasons = [{Tag,Reason}|SubReasons],
-	    run_all(Rest, NewSubBound, NewSubReasons, NewCtx, Opts);
-	{error,_Reason} = Error ->
-	    Error
+        #pass{samples = MoreSamples, printers = MorePrinters} ->
+            NewSamples = lists:reverse(MoreSamples, Samples),
+            NewPrinters = lists:reverse(MorePrinters, Printers),
+            NewCtx = Ctx#ctx{samples = NewSamples, printers = NewPrinters},
+            run_all(Rest, SubBound, SubReasons, NewCtx, Opts);
+        #fail{reason = Reason, bound = SubImmTC, actions = MoreActions} ->
+            NewActions = lists:reverse(MoreActions, Actions),
+            NewCtx = Ctx#ctx{actions = NewActions},
+            NewSubBound =
+                case Mode of
+                    new -> [{Tag,SubImmTC}|SubBound];
+                    _   -> SubBound
+                end,
+            NewSubReasons = [{Tag,Reason}|SubReasons],
+            run_all(Rest, NewSubBound, NewSubReasons, NewCtx, Opts);
+        {error,_Reason} = Error ->
+            Error
     end.
 
 -spec force(delayed_test(), ctx(), opts()) -> run_result().
@@ -1618,38 +1618,38 @@ force(Arg, Prop, Ctx, Opts) ->
 -spec apply_args([proper_gen:instance()], lazy_test(), ctx(), opts()) -> run_result().
 apply_args(Args, Prop, Ctx, Opts) ->
     try apply(Prop, Args) of
-	InnerProp -> run(InnerProp, Ctx, Opts)
+        InnerProp -> run(InnerProp, Ctx, Opts)
     catch
-	?STACKTRACE(error, ErrReason, RawTrace) %, is in macro
-	    case ErrReason =:= function_clause
-		 andalso threw_exception(Prop, RawTrace) of
-		true ->
-		    {error, type_mismatch};
-		false ->
-		    Trace = clean_stacktrace(RawTrace),
-		    create_fail_result(Ctx, {exception,error,ErrReason,Trace})
-	    end;
-	throw:'$arity_limit' ->
-	    {error, arity_limit};
-	throw:{'$cant_generate',MFAs} ->
-	    {error, {cant_generate,MFAs}};
-	throw:{'$typeserver',SubReason} ->
-	    {error, {typeserver,SubReason}};
-	?STACKTRACE(ExcKind, ExcReason, Trace) %, is in macro
-	    create_fail_result(Ctx, {exception,ExcKind,ExcReason,Trace})
-    end.
+        ?STACKTRACE(error, ErrReason, RawTrace) %, is in macro
+        case ErrReason =:= function_clause
+            andalso threw_exception(Prop, RawTrace) of
+            true ->
+                {error, type_mismatch};
+            false ->
+                Trace = clean_stacktrace(RawTrace),
+                create_fail_result(Ctx, {exception,error,ErrReason,Trace})
+        end;
+        throw:'$arity_limit' ->
+            {error, arity_limit};
+        throw:{'$cant_generate',MFAs} ->
+            {error, {cant_generate,MFAs}};
+        throw:{'$typeserver',SubReason} ->
+            {error, {typeserver,SubReason}};
+        ?STACKTRACE(ExcKind, ExcReason, Trace) %, is in macro
+        create_fail_result(Ctx, {exception,ExcKind,ExcReason,Trace})
+        end.
 
 -spec create_pass_result(ctx(), pass_reason()) ->
-	  #pass{performed :: 'undefined'}.
+          #pass{performed :: 'undefined'}.
 create_pass_result(#ctx{samples = Samples, printers = Printers, actions= Actions}, Reason) ->
     #pass{reason = Reason, samples = lists:reverse(Samples),
-	  printers = lists:reverse(Printers), actions = Actions}.
+          printers = lists:reverse(Printers), actions = Actions}.
 
 -spec create_fail_result(ctx(), fail_reason()) ->
-	  #fail{performed :: 'undefined'}.
+          #fail{performed :: 'undefined'}.
 create_fail_result(#ctx{bound = Bound, actions = Actions}, Reason) ->
     #fail{reason = Reason, bound = lists:reverse(Bound),
-	  actions = lists:reverse(Actions)}.
+          actions = lists:reverse(Actions)}.
 
 -spec child(pid(), delayed_test(), ctx(), opts()) -> 'ok'.
 child(Father, Prop, Ctx, Opts) ->
@@ -1660,9 +1660,9 @@ child(Father, Prop, Ctx, Opts) ->
 -spec clear_mailbox() -> 'ok'.
 clear_mailbox() ->
     receive
-	_ -> clear_mailbox()
+        _ -> clear_mailbox()
     after 0 ->
-	ok
+            ok
     end.
 
 -spec threw_exception(function(), stacktrace()) -> boolean().
@@ -1671,9 +1671,9 @@ threw_exception(Fun, [{TopMod,TopName,TopArgs,_Location} | _Rest]) ->
     {name,FunName} = erlang:fun_info(Fun, name),
     {arity,FunArity} = erlang:fun_info(Fun, arity),
     TopArity = if
-		   is_integer(TopArgs) -> TopArgs;
-		   is_list(TopArgs)    -> length(TopArgs)
-	       end,
+                   is_integer(TopArgs) -> TopArgs;
+                   is_list(TopArgs)    -> length(TopArgs)
+               end,
     FunMod =:= TopMod andalso FunName =:= TopName andalso FunArity =:= TopArity.
 
 -spec clean_stacktrace(stacktrace()) -> stacktrace().
@@ -1695,27 +1695,27 @@ clean_testcase(ImmTestCase) ->
     finalize_counterexample(preclean_testcase(ImmTestCase, [])).
 
 -spec preclean_testcase(imm_testcase(), imm_counterexample()) ->
-	  imm_counterexample().
+          imm_counterexample().
 preclean_testcase([], Acc) ->
     lists:reverse(Acc);
 preclean_testcase([{'$conjunction',SubImmTCs} | Rest], Acc) ->
     Rest = [],
     case preclean_sub_imm_testcases(SubImmTCs, []) of
-	[]          -> preclean_testcase([], Acc);
-	SubImmCExms -> preclean_testcase([], [{'$conjunction',SubImmCExms}|Acc])
+        []          -> preclean_testcase([], Acc);
+        SubImmCExms -> preclean_testcase([], [{'$conjunction',SubImmCExms}|Acc])
     end;
 preclean_testcase([ImmInstance | Rest], Acc) ->
     preclean_testcase(Rest, [proper_gen:clean_instance(ImmInstance) | Acc]).
 
 -spec preclean_sub_imm_testcases(sub_imm_testcases(),
-				 sub_imm_counterexamples()) ->
-	  sub_imm_counterexamples().
+                                 sub_imm_counterexamples()) ->
+          sub_imm_counterexamples().
 preclean_sub_imm_testcases([], Acc) ->
     lists:reverse(Acc);
 preclean_sub_imm_testcases([{Tag,ImmTC} | Rest], Acc) ->
     case preclean_testcase(ImmTC, []) of
-	[]      -> preclean_sub_imm_testcases(Rest, Acc);
-	ImmCExm -> preclean_sub_imm_testcases(Rest, [{Tag,ImmCExm} | Acc])
+        []      -> preclean_sub_imm_testcases(Rest, Acc);
+        ImmCExm -> preclean_sub_imm_testcases(Rest, [{Tag,ImmCExm} | Acc])
     end.
 
 -spec finalize_counterexample(imm_counterexample()) -> counterexample().
@@ -1735,153 +1735,153 @@ finalize_input(Instance) ->
 %%-----------------------------------------------------------------------------
 
 -spec shrink(imm_testcase(), test(), fail_reason(), opts()) ->
-	  {'ok',imm_testcase()} | error().
+          {'ok',imm_testcase()} | error().
 shrink(ImmTestCase, Test, Reason,
        #opts{expect_fail = false, noshrink = false, max_shrinks = MaxShrinks,
-	     output_fun = Print, nocolors = NoColors} = Opts) ->
+             output_fun = Print, nocolors = NoColors} = Opts) ->
     ?PRINT(NoColors, ?BOLD_BLUE, Print, "~nShrinking ", []),
     try
-	StrTest = skip_to_next(Test),
-	fix_shrink(ImmTestCase, StrTest, Reason, 0, MaxShrinks, Opts)
+        StrTest = skip_to_next(Test),
+        fix_shrink(ImmTestCase, StrTest, Reason, 0, MaxShrinks, Opts)
     of
-	{Shrinks,MinImmTestCase} ->
-	    case rerun(Test, true, MinImmTestCase) of
-		#fail{actions = MinActions} ->
+        {Shrinks,MinImmTestCase} ->
+            case rerun(Test, true, MinImmTestCase) of
+                #fail{actions = MinActions} ->
                     report_shrinking(Shrinks, MinImmTestCase, MinActions, Opts),
-		    {ok, MinImmTestCase};
-		%% The cases below should never occur for deterministic tests.
-		%% When they do happen, we have no choice but to silently
-		%% skip the fail actions.
-		#pass{} ->
+                    {ok, MinImmTestCase};
+                %% The cases below should never occur for deterministic tests.
+                %% When they do happen, we have no choice but to silently
+                %% skip the fail actions.
+                #pass{} ->
                     report_shrinking(Shrinks, MinImmTestCase, [], Opts),
-		    {ok, MinImmTestCase};
-		{error,_Reason} ->
+                    {ok, MinImmTestCase};
+                {error,_Reason} ->
                     report_shrinking(Shrinks, MinImmTestCase, [], Opts),
-		    {ok, MinImmTestCase}
-	    end
+                    {ok, MinImmTestCase}
+            end
     catch
-	throw:non_boolean_result ->
-	    Print("~n", []),
-	    {error, non_boolean_result}
+        throw:non_boolean_result ->
+            Print("~n", []),
+            {error, non_boolean_result}
     end;
 shrink(ImmTestCase, _Test, _Reason, _Opts) ->
     {ok, ImmTestCase}.
 
 -spec fix_shrink(imm_testcase(), stripped_test(), fail_reason(),
-		 non_neg_integer(), non_neg_integer(), opts()) ->
-	  shrinking_result().
+                 non_neg_integer(), non_neg_integer(), opts()) ->
+          shrinking_result().
 fix_shrink(ImmTestCase, _StrTest, _Reason, Shrinks, 0, _Opts) ->
     {Shrinks, ImmTestCase};
 fix_shrink(ImmTestCase, StrTest, Reason, Shrinks, ShrinksLeft, Opts) ->
     case shrink([], ImmTestCase, StrTest, Reason, 0, ShrinksLeft, init, Opts) of
-	{0,_MinImmTestCase} ->
-	    {Shrinks, ImmTestCase};
-	{MoreShrinks,MinImmTestCase} ->
-	    fix_shrink(MinImmTestCase, StrTest, Reason, Shrinks + MoreShrinks,
-		       ShrinksLeft - MoreShrinks, Opts)
+        {0,_MinImmTestCase} ->
+            {Shrinks, ImmTestCase};
+        {MoreShrinks,MinImmTestCase} ->
+            fix_shrink(MinImmTestCase, StrTest, Reason, Shrinks + MoreShrinks,
+                       ShrinksLeft - MoreShrinks, Opts)
     end.
 
 -spec shrink(imm_testcase(), imm_testcase(), stripped_test(), fail_reason(),
-	     non_neg_integer(), non_neg_integer(), proper_shrink:state(),
-	     opts()) -> shrinking_result().
+             non_neg_integer(), non_neg_integer(), proper_shrink:state(),
+             opts()) -> shrinking_result().
 %% TODO: 'tries_left' instead of 'shrinks_left'? shrinking timeout?
 %% TODO: Can we do anything better for non-deterministic tests?
 shrink(Shrunk, TestTail, StrTest, _Reason,
        Shrinks, ShrinksLeft, _State, _Opts) when is_boolean(StrTest)
-					  orelse ShrinksLeft =:= 0
-					  orelse TestTail =:= []->
+                                                 orelse ShrinksLeft =:= 0
+                                                 orelse TestTail =:= []->
     {Shrinks, lists:reverse(Shrunk, TestTail)};
 shrink(Shrunk, [ImmInstance | Rest], {_Type,Prop}, Reason,
        Shrinks, ShrinksLeft, done, Opts) ->
     Instance = proper_gen:clean_instance(ImmInstance),
     NewStrTest = force_skip(Instance, Prop),
     shrink([ImmInstance | Shrunk], Rest, NewStrTest, Reason,
-	   Shrinks, ShrinksLeft, init, Opts);
+           Shrinks, ShrinksLeft, init, Opts);
 shrink(Shrunk, [RawImmInstance | Rest] = TestTail, {Type,Prop} = StrTest, Reason,
        Shrinks, ShrinksLeft, State, Opts) ->
     ImmInstance = case proper_types:find_prop(is_user_nf, Type) of
-                    {ok, true} ->
-                      case proper_types:safe_is_instance(RawImmInstance, Type) of
-                        false -> proper_gen:clean_instance(RawImmInstance);
-                        true -> RawImmInstance
-                      end;
-                    {ok, false} -> RawImmInstance;
-                    error -> RawImmInstance
+                      {ok, true} ->
+                          case proper_types:safe_is_instance(RawImmInstance, Type) of
+                              false -> proper_gen:clean_instance(RawImmInstance);
+                              true -> RawImmInstance
+                          end;
+                      {ok, false} -> RawImmInstance;
+                      error -> RawImmInstance
                   end,
     {NewImmInstances,NewState} = proper_shrink:shrink(ImmInstance, Type, State),
     %% TODO: Should we try fixing the nested ?FORALLs while shrinking? We could
     %%       also just produce new test tails.
     IsValid = fun(I) ->
-		  I =/= ImmInstance andalso
-		  still_fails(I, Rest, Prop, Reason)
-	      end,
+                      I =/= ImmInstance andalso
+                          still_fails(I, Rest, Prop, Reason)
+              end,
     case proper_arith:find_first(IsValid, NewImmInstances) of
-	none ->
-	    shrink(Shrunk, TestTail, StrTest, Reason,
-		   Shrinks, ShrinksLeft, NewState, Opts);
-	{Pos, ShrunkImmInstance} ->
-	    (Opts#opts.output_fun)(".", []),
-	    shrink(Shrunk, [ShrunkImmInstance | Rest], StrTest, Reason,
-		   Shrinks+1, ShrinksLeft-1, {shrunk,Pos,NewState}, Opts)
+        none ->
+            shrink(Shrunk, TestTail, StrTest, Reason,
+                   Shrinks, ShrinksLeft, NewState, Opts);
+        {Pos, ShrunkImmInstance} ->
+            (Opts#opts.output_fun)(".", []),
+            shrink(Shrunk, [ShrunkImmInstance | Rest], StrTest, Reason,
+                   Shrinks+1, ShrinksLeft-1, {shrunk,Pos,NewState}, Opts)
     end;
 shrink(Shrunk, [{'$conjunction',SubImmTCs}], SubProps, {sub_props,SubReasons},
        Shrinks, ShrinksLeft, init, Opts) when is_list(SubProps) ->
     shrink_all(Shrunk, [], SubImmTCs, SubProps, SubReasons,
-	       Shrinks, ShrinksLeft, Opts).
+               Shrinks, ShrinksLeft, Opts).
 
 -spec shrink_all(imm_testcase(), sub_imm_testcases(), sub_imm_testcases(),
-		 [{tag(),test()}], [{tag(),fail_reason()}],
-		 non_neg_integer(), non_neg_integer(), opts()) ->
-	  shrinking_result().
+                 [{tag(),test()}], [{tag(),fail_reason()}],
+                 non_neg_integer(), non_neg_integer(), opts()) ->
+          shrinking_result().
 shrink_all(ShrunkHead, Shrunk, SubImmTCs, _SubProps, _SubReasons,
-	   Shrinks, 0, _Opts) ->
+           Shrinks, 0, _Opts) ->
     ShrunkSubImmTCs = lists:reverse(Shrunk, SubImmTCs),
     ImmTC = lists:reverse([{'$conjunction',ShrunkSubImmTCs} | ShrunkHead]),
     {Shrinks, ImmTC};
 shrink_all(ShrunkHead, Shrunk, [], [], [],
-	   Shrinks, _ShrinksLeft, Opts) ->
+           Shrinks, _ShrinksLeft, Opts) ->
     shrink_all(ShrunkHead, Shrunk, [], [], [], Shrinks, 0, Opts);
 shrink_all(ShrunkHead, Shrunk, SubImmTCs, [{Tag,Prop}|Rest], SubReasons,
-	   Shrinks, ShrinksLeft, Opts) ->
+           Shrinks, ShrinksLeft, Opts) ->
     case lists:keytake(Tag, 1, SubReasons) of
-	{value,{Tag,Reason},NewSubReasons} ->
-	    {value,{Tag,SubImmTC},NewSubImmTCs} =
-		lists:keytake(Tag, 1, SubImmTCs),
-	    {MoreShrinks,MinSubImmTC} =
-		shrink([], SubImmTC, skip_to_next(Prop), Reason,
-		       0, ShrinksLeft, init, Opts),
-	    shrink_all(ShrunkHead, [{Tag,MinSubImmTC}|Shrunk], NewSubImmTCs,
-		       Rest, NewSubReasons, Shrinks+MoreShrinks,
-		       ShrinksLeft-MoreShrinks, Opts);
-	false ->
-	    shrink_all(ShrunkHead, Shrunk, SubImmTCs, Rest, SubReasons,
-		       Shrinks, ShrinksLeft, Opts)
+        {value,{Tag,Reason},NewSubReasons} ->
+            {value,{Tag,SubImmTC},NewSubImmTCs} =
+                lists:keytake(Tag, 1, SubImmTCs),
+            {MoreShrinks,MinSubImmTC} =
+                shrink([], SubImmTC, skip_to_next(Prop), Reason,
+                       0, ShrinksLeft, init, Opts),
+            shrink_all(ShrunkHead, [{Tag,MinSubImmTC}|Shrunk], NewSubImmTCs,
+                       Rest, NewSubReasons, Shrinks+MoreShrinks,
+                       ShrinksLeft-MoreShrinks, Opts);
+        false ->
+            shrink_all(ShrunkHead, Shrunk, SubImmTCs, Rest, SubReasons,
+                       Shrinks, ShrinksLeft, Opts)
     end.
 
 -spec still_fails(proper_gen:imm_instance(), imm_testcase(), dependent_test(),
-		  fail_reason()) -> boolean().
+                  fail_reason()) -> boolean().
 still_fails(ImmInstance, TestTail, Prop, OldReason) ->
     Instance = proper_gen:clean_instance(ImmInstance),
     Ctx = #ctx{mode = try_shrunk, bound = TestTail},
     case force(Instance, Prop, Ctx, #opts{}) of
-	#fail{reason = NewReason} ->
-	    same_fail_reason(OldReason, NewReason);
-	_ ->
-	    false
+        #fail{reason = NewReason} ->
+            same_fail_reason(OldReason, NewReason);
+        _ ->
+            false
     end.
 
 -spec same_fail_reason(fail_reason(), fail_reason()) -> boolean().
- %% We don't mind if the stacktraces are different.
+%% We don't mind if the stacktraces are different.
 same_fail_reason({trapped,{ExcReason1,_StackTrace1}},
-		 {trapped,{ExcReason2,_StackTrace2}}) ->
+                 {trapped,{ExcReason2,_StackTrace2}}) ->
     same_exc_reason(ExcReason1, ExcReason2);
 same_fail_reason({exception,SameExcKind,ExcReason1,_StackTrace1},
-		 {exception,SameExcKind,ExcReason2,_StackTrace2}) ->
+                 {exception,SameExcKind,ExcReason2,_StackTrace2}) ->
     same_exc_reason(ExcReason1, ExcReason2);
 same_fail_reason({sub_props,SubReasons1}, {sub_props,SubReasons2}) ->
     length(SubReasons1) =:= length(SubReasons2) andalso
-    lists:all(fun({A,B}) -> same_sub_reason(A,B) end,
-	      lists:zip(lists:sort(SubReasons1),lists:sort(SubReasons2)));
+        lists:all(fun({A,B}) -> same_sub_reason(A,B) end,
+                  lists:zip(lists:sort(SubReasons1),lists:sort(SubReasons2)));
 same_fail_reason(SameReason, SameReason) ->
     true;
 same_fail_reason(_, _) ->
@@ -1892,17 +1892,17 @@ same_exc_reason(ExcReason1, ExcReason2) ->
     %% We assume that exception reasons are either atoms or tagged tuples.
     %% What we try to do is force the generation of the same exception reason.
     if
-	is_atom(ExcReason1) ->
-	    ExcReason1 =:= ExcReason2;
-	is_tuple(ExcReason1) ->
-	    is_tuple(ExcReason2)
-	    andalso tuple_size(ExcReason1) >= 1
-	    andalso tuple_size(ExcReason1) =:= tuple_size(ExcReason2)
-	    %% We assume that the tag is the first element.
-	    andalso is_atom(element(1, ExcReason1))
-	    andalso element(1, ExcReason1) =:= element(1, ExcReason2);
-	true ->
-	    false
+        is_atom(ExcReason1) ->
+            ExcReason1 =:= ExcReason2;
+        is_tuple(ExcReason1) ->
+            is_tuple(ExcReason2)
+                andalso tuple_size(ExcReason1) >= 1
+                andalso tuple_size(ExcReason1) =:= tuple_size(ExcReason2)
+            %% We assume that the tag is the first element.
+                andalso is_atom(element(1, ExcReason1))
+                andalso element(1, ExcReason1) =:= element(1, ExcReason2);
+        true ->
+            false
     end.
 
 -spec same_sub_reason({tag(),fail_reason()},{tag(),fail_reason()}) -> boolean().
@@ -1931,8 +1931,8 @@ skip_to_next({conjunction,SubProps}) ->
     SubProps;
 skip_to_next({implies,Pre,Prop}) ->
     case Pre of
-	true  -> force_skip(Prop);
-	false -> true
+        true  -> force_skip(Prop);
+        false -> true
     end;
 skip_to_next({sample,_Sample,_Printer,Prop}) ->
     skip_to_next(Prop);
@@ -1957,13 +1957,13 @@ force_skip(Arg, Prop) ->
 -spec apply_skip([proper_gen:instance()], lazy_test()) -> stripped_test().
 apply_skip(Args, Prop) ->
     try
-	apply(Prop, Args)
+        apply(Prop, Args)
     of
-	InnerTest -> skip_to_next(InnerTest)
+        InnerTest -> skip_to_next(InnerTest)
     catch
-	%% Should be OK to catch everything here, since we have already tested
-	%% at this point that the test still fails.
-	_ExcKind:_ExcReason -> false
+        %% Should be OK to catch everything here, since we have already tested
+        %% at this point that the test still fails.
+        _ExcKind:_ExcReason -> false
     end.
 
 
@@ -1973,32 +1973,32 @@ apply_skip(Args, Prop) ->
 
 -spec report_imm_result(imm_result(), opts()) -> 'ok'.
 report_imm_result(#pass{samples = Samples, printers = Printers,
-			performed = Performed},
+                        performed = Performed},
                   #opts{expect_fail = ExpectF, output_fun = Print,
                         nocolors = NoColors}) ->
     case ExpectF of
         true ->
-	    ?PRINT(NoColors, ?BOLD_RED, Print,
-		   "Failed: All tests passed when a failure was expected.~n",
-		   []);
+            ?PRINT(NoColors, ?BOLD_RED, Print,
+                   "Failed: All tests passed when a failure was expected.~n",
+                   []);
         false ->
-	    ?PRINT(NoColors, ?BOLD_GREEN, Print,
-		   "OK: Passed ~b test(s).~n", [Performed])
+            ?PRINT(NoColors, ?BOLD_GREEN, Print,
+                   "OK: Passed ~b test(s).~n", [Performed])
     end,
     SortedSamples = [lists:sort(Sample) || Sample <- Samples],
     lists:foreach(fun({P,S}) -> apply_stats_printer(P, S, Print) end,
-		  proper_arith:safe_zip(Printers, SortedSamples));
+                  proper_arith:safe_zip(Printers, SortedSamples));
 report_imm_result(#fail{reason = Reason, bound = Bound, actions = Actions,
-			performed = Performed},
+                        performed = Performed},
                   #opts{expect_fail = ExpectF, output_fun = Print,
                         nocolors = NoColors}) ->
     case ExpectF of
         true ->
-	    ?PRINT(NoColors, ?BOLD_GREEN, Print,
-		   "OK: Failed as expected, after ~b test(s).~n", [Performed]);
+            ?PRINT(NoColors, ?BOLD_GREEN, Print,
+                   "OK: Failed as expected, after ~b test(s).~n", [Performed]);
         false ->
-	    ?PRINT(NoColors, ?BOLD_RED, Print,
-		   "Failed: After ~b test(s).~n", [Performed])
+            ?PRINT(NoColors, ?BOLD_RED, Print,
+                   "Failed: After ~b test(s).~n", [Performed])
     end,
     report_fail_reason(Reason, "", Print),
     print_imm_testcase(Bound, "", Print),
@@ -2009,14 +2009,14 @@ report_imm_result({error,Reason}, #opts{output_fun = Print}) ->
 -spec report_rerun_result(run_result(), opts()) -> 'ok'.
 report_rerun_result(#pass{reason = Reason},
                     #opts{expect_fail = ExpectF, output_fun = Print,
-			  nocolors = NoColors}) ->
+                          nocolors = NoColors}) ->
     case ExpectF of
         true  -> ?PRINT(NoColors, ?BOLD_RED, Print, "Failed: ", []);
         false -> ?PRINT(NoColors, ?BOLD_GREEN, Print, "OK: ", [])
     end,
     case Reason of
-	true_prop   -> Print("The input passed the test.~n", []);
-	didnt_crash -> Print("The input didn't raise an early exception.~n", [])
+        true_prop   -> Print("The input passed the test.~n", []);
+        didnt_crash -> Print("The input didn't raise an early exception.~n", [])
     end;
 report_rerun_result(#fail{reason = Reason, actions = Actions},
                     #opts{expect_fail = ExpectF, output_fun = Print,
@@ -2050,15 +2050,15 @@ report_error(too_many_instances, Print) ->
     Print(?MISMATCH_MSG ++ "It's too long.~n", []); %% that's what she said
 report_error(type_mismatch, Print) ->
     Print("Error: The variables' and types' structures inside a ?FORALL don't "
-	  "match.~n", []);
+          "match.~n", []);
 report_error(wrong_type, Print) ->
     Print("Internal error: 'wrong_type' error reached toplevel.~n"
-	  "Please notify the maintainers about this error.~n", []);
+          "Please notify the maintainers about this error.~n", []);
 report_error({typeserver,SubReason}, Print) ->
     Print("Error: The typeserver encountered an error: ~w.~n", [SubReason]);
 report_error({unexpected,Unexpected}, Print) ->
     Print("Internal error: The last run returned an unexpected result:~n~w~n"
-	  "Please notify the maintainers about this error.~n", [Unexpected]);
+          "Please notify the maintainers about this error.~n", [Unexpected]);
 report_error({erroneous_option,UserOpt}, Print) ->
     Print("Error: Erroneous option: ~w.~n", [UserOpt]);
 report_error({unrecognized_option,UserOpt}, Print) ->
@@ -2076,14 +2076,14 @@ report_fail_reason({exception,ExcKind,ExcReason,StackTrace}, Prefix, Print) ->
     Print(Prefix ++ "Stacktrace: ~p.~n", [StackTrace]);
 report_fail_reason({sub_props,SubReasons}, Prefix, Print) ->
     Report =
-	fun({Tag,Reason}) ->
-	    Print(Prefix ++ "Sub-property ~w failed.~n", [Tag]),
-	    report_fail_reason(Reason, ">> " ++ Prefix, Print)
-	end,
+        fun({Tag,Reason}) ->
+                Print(Prefix ++ "Sub-property ~w failed.~n", [Tag]),
+                report_fail_reason(Reason, ">> " ++ Prefix, Print)
+        end,
     lists:foreach(Report, SubReasons);
 report_fail_reason(exists, _Prefix, _Print) ->
     ok;
-    %% Print(Prefix ++ "Found a value that should not exist.~n", []);
+%% Print(Prefix ++ "Found a value that should not exist.~n", []);
 report_fail_reason(not_found, Prefix, Print) ->
     Print(Prefix ++ "Could not find a value that should exist.~n", []).
 
@@ -2093,7 +2093,7 @@ print_imm_testcase(ImmTestCase, Prefix, Print) ->
     print_imm_counterexample(ImmCExm, Prefix, Print).
 
 -spec print_imm_counterexample(imm_counterexample(), string(), output_fun()) ->
-	  'ok'.
+          'ok'.
 print_imm_counterexample(ImmCExm, Prefix, Print) ->
     PrintImmCleanInput = fun(I) -> print_imm_clean_input(I, Prefix, Print) end,
     lists:foreach(PrintImmCleanInput, ImmCExm).
@@ -2101,10 +2101,10 @@ print_imm_counterexample(ImmCExm, Prefix, Print) ->
 -spec print_imm_clean_input(imm_clean_input(), string(), output_fun()) -> 'ok'.
 print_imm_clean_input({'$conjunction',SubImmCExms}, Prefix, Print) ->
     PrintSubImmCExm =
-	fun({Tag,ImmCExm}) ->
-	    Print(Prefix ++ "~w:~n", [Tag]),
-	    print_imm_counterexample(ImmCExm, ">> " ++ Prefix, Print)
-	end,
+        fun({Tag,ImmCExm}) ->
+                Print(Prefix ++ "~w:~n", [Tag]),
+                print_imm_counterexample(ImmCExm, ">> " ++ Prefix, Print)
+        end,
     lists:foreach(PrintSubImmCExm, SubImmCExms);
 print_imm_clean_input(Instance, Prefix, Print) ->
     Print(Prefix ++ "~w~n", [Instance]).
@@ -2130,8 +2130,8 @@ report_shrinking(NumShrinks, MinImmTestCase, MinActions, Opts) ->
 apply_stats_printer(Printer, SortedSample, Print) ->
     {arity,Arity} = erlang:fun_info(Printer, arity),
     case Arity of
-	1 -> Printer(SortedSample);
-	2 -> Printer(SortedSample, Print)
+        1 -> Printer(SortedSample);
+        2 -> Printer(SortedSample, Print)
     end.
 
 %% @doc A predefined function that accepts an atom or string and returns a
@@ -2154,10 +2154,10 @@ print_title(RawTitle, Print) ->
     Title = if
                 is_atom(RawTitle) -> atom_to_list(RawTitle);
                 is_list(RawTitle) -> RawTitle
-	    end,
+            end,
     case Title of
-	"" -> ok;
-	_  -> Print(Title ++ "~n", [])
+        "" -> ok;
+        _  -> Print(Title ++ "~n", [])
     end.
 
 -spec process_sorted_sample(sample()) -> freq_sample().
@@ -2173,7 +2173,7 @@ get_freqs([Term | Rest], Freqs) ->
     get_freqs(Others, [{Term,Freq} | Freqs]).
 
 -spec remove_all(term(), proper_types:frequency(), sample()) ->
-	  {proper_types:frequency(), sample()}.
+          {proper_types:frequency(), sample()}.
 remove_all(X, Freq, [X | Rest]) ->
     remove_all(X, Freq + 1, Rest);
 remove_all(_X, Freq, Sample) ->
@@ -2190,7 +2190,7 @@ num_stats_printer(SortedSample, Print, Title) ->
     Print("minimum: ~w~naverage: ~w~nmaximum: ~w~n", [Min,Avg,Max]).
 
 -spec get_numeric_stats([]) -> {'undefined', 'undefined', 'undefined'};
-		       ([number(),...]) -> numeric_stats().
+                       ([number(),...]) -> numeric_stats().
 get_numeric_stats([]) ->
     {undefined, undefined, undefined};
 get_numeric_stats([Min | _Rest] = SortedSample) ->
@@ -2198,7 +2198,7 @@ get_numeric_stats([Min | _Rest] = SortedSample) ->
     {Min, Avg, Max}.
 
 -spec avg_and_last([number(),...], number(), non_neg_integer()) ->
-	  {float(), number()}.
+          {float(), number()}.
 avg_and_last([Last], Sum, Len) ->
     {(Sum + Last) / (Len + 1), Last};
 avg_and_last([X | Rest], Sum, Len) ->
@@ -2206,8 +2206,8 @@ avg_and_last([X | Rest], Sum, Len) ->
 
 -spec mfas_to_string([mfa()]) -> string().
 mfas_to_string(MFAs) ->
-  string:join([mfa_to_string(MFA) || MFA <- MFAs], ", ").
+    string:join([mfa_to_string(MFA) || MFA <- MFAs], ", ").
 
 -spec mfa_to_string(mfa()) -> string().
 mfa_to_string({M, F, A}) ->
-  io_lib:format("~p:~p/~p", [M, F, A]).
+    io_lib:format("~p:~p/~p", [M, F, A]).

@@ -24,9 +24,9 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module contains PropEr's helper parse transformer. It is
-%%%	 automatically applied to modules when compiled internally by the
-%%%	 typeserver. It essentially removes all functions that contain ?FORALLs,
-%%%	 to counter an obscure bug.
+%%%      automatically applied to modules when compiled internally by the
+%%%      typeserver. It essentially removes all functions that contain ?FORALLs,
+%%%      to counter an obscure bug.
 %%% @private
 
 -module(proper_prop_remover).
@@ -54,7 +54,7 @@ safe_form(_Form) ->
 -spec safe_clause(abs_clause()) -> boolean().
 safe_clause({clause,_Line,PatSeq,_Guards,Body}) ->
     lists:all(fun safe_expr/1, PatSeq)
-    andalso lists:all(fun safe_expr/1, Body).
+        andalso lists:all(fun safe_expr/1, Body).
 
 %% This also covers some other constructs that don't clash with expressions:
 %% binary element specifications, list and binary comprehension generators and
@@ -104,15 +104,15 @@ safe_expr({'case',_Line,Expr,Clauses}) ->
     safe_expr(Expr) andalso lists:all(fun safe_clause/1, Clauses);
 safe_expr({'try',_Line,Body1,Clauses1,Clauses2,Body2}) ->
     lists:all(fun safe_expr/1, Body1)
-    andalso lists:all(fun safe_clause/1, Clauses1)
-    andalso lists:all(fun safe_clause/1, Clauses2)
-    andalso lists:all(fun safe_expr/1, Body2);
+        andalso lists:all(fun safe_clause/1, Clauses1)
+        andalso lists:all(fun safe_clause/1, Clauses2)
+        andalso lists:all(fun safe_expr/1, Body2);
 safe_expr({'receive',_Line,Clauses}) ->
     lists:all(fun safe_clause/1, Clauses);
 safe_expr({'receive',_Line,Clauses,AfterExpr,AfterBody}) ->
     lists:all(fun safe_clause/1, Clauses)
-    andalso safe_expr(AfterExpr)
-    andalso lists:all(fun safe_expr/1, AfterBody);
+        andalso safe_expr(AfterExpr)
+        andalso lists:all(fun safe_expr/1, AfterBody);
 safe_expr({'fun',_Line,{clauses,Clauses}}) ->
     lists:all(fun safe_clause/1, Clauses);
 safe_expr({'query',_Line,ListCompr}) ->

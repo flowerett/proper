@@ -30,7 +30,7 @@
 
 -export([test/0, test/1, sample_commands/0]).
 -export([initial_state/0, initial_state_data/0, precondition/4, weight/3,
-	 postcondition/5, next_state_data/5, empty_pdict/1, non_empty_pdict/1]).
+         postcondition/5, next_state_data/5, empty_pdict/1, non_empty_pdict/1]).
 -export([set_up/0, clean_up/0]).
 
 -include_lib("proper/include/proper.hrl").
@@ -49,16 +49,16 @@ test(N) ->
 
 prop_pdict() ->
     ?FORALL(Cmds, proper_fsm:commands(?MODULE),
-	    begin
-		set_up(),
-		{H,S,Res} = proper_fsm:run_commands(?MODULE, Cmds),
-		clean_up(),
-		?WHENFAIL(
-		   io:format("History: ~w\nState: ~w\nRes: ~w\n", [H, S, Res]),
-		   aggregate(zip(proper_fsm:state_names(H),
-				 command_names(Cmds)),
-			     Res =:= ok))
-	    end).
+            begin
+                set_up(),
+                {H,S,Res} = proper_fsm:run_commands(?MODULE, Cmds),
+                clean_up(),
+                ?WHENFAIL(
+                   io:format("History: ~w\nState: ~w\nRes: ~w\n", [H, S, Res]),
+                   aggregate(zip(proper_fsm:state_names(H),
+                                 command_names(Cmds)),
+                             Res =:= ok))
+            end).
 
 set_up() -> ok.
 
@@ -105,8 +105,8 @@ postcondition(_, _, Props, {call,erlang,erase,[Key]}, Val) ->
 next_state_data(_, _, Props, _Var, {call,erlang,put,[Key,Value]}) ->
     %% correct model
     [{Key,Value}|proplists:delete(Key, Props)];
-    %% wrong model
-    %% Props ++ [{Key,Value}];
+%% wrong model
+%% Props ++ [{Key,Value}];
 next_state_data(_, _, Props, _Var, {call,erlang,erase,[Key]}) ->
     proplists:delete(Key, Props);
 next_state_data(_, _, Props, _Var, {call,erlang,get,[_]}) ->

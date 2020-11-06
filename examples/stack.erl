@@ -33,12 +33,12 @@
 -opaque stack(T) :: {non_neg_integer(),[T]}.
 
 %% NOTE: You don't need to include the proper header if no properties are
-%%	 declared in the module.
+%%       declared in the module.
 -include_lib("proper/include/proper.hrl").
 
 %% NOTE: Every instance of the ADT in a spec must have variables as parameters.
-%%	 When this would mean singleton variables, use variables starting with
-%%	 an underscore.
+%%       When this would mean singleton variables, use variables starting with
+%%       an underscore.
 -spec is_empty(stack(_T)) -> boolean().
 is_empty({0, []}) ->
     true;
@@ -75,7 +75,7 @@ safe_pop({N, [Top|Rest]}) when N > 0 ->
 
 prop_push_pop() ->
     ?FORALL({X,S}, {integer(),stack(integer())},
-	    begin
-		{Y,_} = pop(push(X,S)),
-		X =:= Y
-	    end).
+            begin
+                {Y,_} = pop(push(X,S)),
+                X =:= Y
+            end).

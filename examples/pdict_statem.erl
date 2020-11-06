@@ -30,7 +30,7 @@
 
 -export([test/0, test/1]).
 -export([initial_state/0, command/1, precondition/2, postcondition/3,
-	 next_state/3]).
+         next_state/3]).
 -export([set_up/0, clean_up/0]).  % needed by the PropEr test suite
 
 -include_lib("proper/include/proper.hrl").
@@ -48,14 +48,14 @@ test(N) ->
 
 prop_pdict() ->
     ?FORALL(Cmds, commands(?MODULE),
-	    begin
-		?MODULE:set_up(),
-		{H,S,Res} = run_commands(?MODULE, Cmds),
-		?MODULE:clean_up(),
-		?WHENFAIL(
-		   io:format("History: ~w~nState: ~w~nRes: ~w~n", [H, S, Res]),
-		   aggregate(command_names(Cmds), Res =:= ok))
-	    end).
+            begin
+                ?MODULE:set_up(),
+                {H,S,Res} = run_commands(?MODULE, Cmds),
+                ?MODULE:clean_up(),
+                ?WHENFAIL(
+                   io:format("History: ~w~nState: ~w~nRes: ~w~n", [H, S, Res]),
+                   aggregate(command_names(Cmds), Res =:= ok))
+            end).
 
 set_up() -> ok.
 
@@ -72,10 +72,10 @@ command([]) ->
     {call,erlang,put,[key(), integer()]};
 command(Props) ->
     ?LET({Key,Value}, weighted_union([{2, elements(Props)},
-				      {1, {key(),integer()}}]),
-	 oneof([{call,erlang,put,[Key,Value]},
-		{call,erlang,get,[Key]},
-		{call,erlang,erase,[Key]}])).
+                                      {1, {key(),integer()}}]),
+         oneof([{call,erlang,put,[Key,Value]},
+                {call,erlang,get,[Key]},
+                {call,erlang,erase,[Key]}])).
 
 precondition(_, {call,erlang,put,[_,_]}) ->
     true;
@@ -96,8 +96,8 @@ postcondition(Props, {call,erlang,erase,[Key]}, Val) ->
 next_state(Props, _Var, {call,erlang,put,[Key,Value]}) ->
     %% correct model
     [{Key,Value}|proplists:delete(Key, Props)];
-    %% wrong model
-    %% Props ++ [{Key,Value}];
+%% wrong model
+%% Props ++ [{Key,Value}];
 next_state(Props, _Var, {call,erlang,erase,[Key]}) ->
     proplists:delete(Key, Props);
 next_state(Props, _Var, {call,erlang,get,[_]}) ->

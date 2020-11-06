@@ -86,22 +86,22 @@
 
 
 start_link() ->
-  gen_statem:start_link({local, ?NAME}, ?MODULE, [], []).
+    gen_statem:start_link({local, ?NAME}, ?MODULE, [], []).
 
 stop() ->
-  gen_statem:stop(?NAME).
+    gen_statem:stop(?NAME).
 
 accelerate(Value) ->
-  gen_statem:call(?NAME, {accelerate, Value}).
+    gen_statem:call(?NAME, {accelerate, Value}).
 
 brake(Value) ->
-  gen_statem:call(?NAME, {brake, Value}).
+    gen_statem:call(?NAME, {brake, Value}).
 
 travel(Distance) ->
-  gen_statem:call(?NAME, {travel, Distance}).
+    gen_statem:call(?NAME, {travel, Distance}).
 
 refuel(Amount) ->
-  gen_statem:call(?NAME, {refuel, Amount}).
+    gen_statem:call(?NAME, {refuel, Amount}).
 
 
 %% -----------------------------------------------------------------------------
@@ -110,39 +110,39 @@ refuel(Amount) ->
 
 
 init([]) ->
-  {ok, stopped, #state{fuel = ?MAX_FUEL, speed = 0}}.
+    {ok, stopped, #state{fuel = ?MAX_FUEL, speed = 0}}.
 
 callback_mode() ->
-  state_functions.
+    state_functions.
 
 stopped({call, From}, {accelerate, Value}, S) ->
-  accelerate_helper(From, Value, S);
+    accelerate_helper(From, Value, S);
 stopped({call, From}, {refuel, Value}, S) ->
-  refuel_helper(From, Value, S).
+    refuel_helper(From, Value, S).
 
 slow({call, From}, {accelerate, Value}, S) ->
-  accelerate_helper(From, Value, S);
+    accelerate_helper(From, Value, S);
 slow({call, From}, {brake, Value}, S) ->
-  accelerate_helper(From, -Value, S);
+    accelerate_helper(From, -Value, S);
 slow({call, From}, {travel, Value}, S) ->
-  travel_helper(From, Value, S);
+    travel_helper(From, Value, S);
 slow({call, From}, {refuel, Value}, S) ->
-  refuel_helper(From, Value, S).
+    refuel_helper(From, Value, S).
 
 fast({call, From}, {accelerate, Value}, S) ->
-  accelerate_helper(From, Value, S);
+    accelerate_helper(From, Value, S);
 fast({call, From}, {brake, Value}, S) ->
-  accelerate_helper(From, -Value, S);
+    accelerate_helper(From, -Value, S);
 fast({call, From}, {travel, Value}, S) ->
-  travel_helper(From, Value, S);
+    travel_helper(From, Value, S);
 fast({call, From}, {refuel, Value}, S) ->
-  refuel_helper(From, Value, S).
+    refuel_helper(From, Value, S).
 
 terminate(_Reason, _StateName, _State) ->
-  ok.
+    ok.
 
 code_change(_OldVsn, StateName, State, _Extra) ->
-  {ok, StateName, State}.
+    {ok, StateName, State}.
 
 
 %% -----------------------------------------------------------------------------
@@ -151,29 +151,29 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 
 
 accelerate_helper(From, Value, S) ->
-  #state{fuel = Fuel, speed = Speed} = S,
-  Calc = acceleration_calculations(Speed, Value, Fuel),
-  {Distance, Acceleration, Burnt} = Calc,
-  StateName = state_name(Speed + Acceleration),
-  gen_statem:reply(From, {Distance, Burnt}),
-  NS = S#state{fuel = Fuel - Burnt, speed = Speed + Acceleration},
-  {next_state, StateName, NS}.
+    #state{fuel = Fuel, speed = Speed} = S,
+    Calc = acceleration_calculations(Speed, Value, Fuel),
+    {Distance, Acceleration, Burnt} = Calc,
+    StateName = state_name(Speed + Acceleration),
+    gen_statem:reply(From, {Distance, Burnt}),
+    NS = S#state{fuel = Fuel - Burnt, speed = Speed + Acceleration},
+    {next_state, StateName, NS}.
 
 travel_helper(From, Value, S) ->
-  #state{fuel = Fuel, speed = Speed} = S,
-  {RealDistance, Burnt} = travel_calculations(Value, Speed, Fuel),
-  StateName = state_name(Speed),
-  gen_statem:reply(From, {RealDistance, Burnt}),
-  NS = S#state{fuel = Fuel - Burnt},
-  {next_state, StateName, NS}.
+    #state{fuel = Fuel, speed = Speed} = S,
+    {RealDistance, Burnt} = travel_calculations(Value, Speed, Fuel),
+    StateName = state_name(Speed),
+    gen_statem:reply(From, {RealDistance, Burnt}),
+    NS = S#state{fuel = Fuel - Burnt},
+    {next_state, StateName, NS}.
 
 refuel_helper(From, Value, S) ->
-  #state{fuel = Fuel, speed = Speed} = S,
-  Calc = acceleration_calculations(Speed, -Speed, Fuel),
-  {Distance, _, Burnt} = Calc,
-  gen_statem:reply(From, {Distance, Burnt}),
-  NS = S#state{fuel = min(?MAX_FUEL, Fuel - Burnt + Value), speed = 0},
-  {next_state, state_name(0), NS}.
+    #state{fuel = Fuel, speed = Speed} = S,
+    Calc = acceleration_calculations(Speed, -Speed, Fuel),
+    {Distance, _, Burnt} = Calc,
+    gen_statem:reply(From, {Distance, Burnt}),
+    NS = S#state{fuel = min(?MAX_FUEL, Fuel - Burnt + Value), speed = 0},
+    {next_state, state_name(0), NS}.
 
 
 %% -----------------------------------------------------------------------------
@@ -182,16 +182,16 @@ refuel_helper(From, Value, S) ->
 
 
 accelerator(Speed, slow) ->
-  integer(1, ?SLOW_THRESHOLD - Speed);
+    integer(1, ?SLOW_THRESHOLD - Speed);
 accelerator(Speed, fast) ->
-  integer(max(1, ?SLOW_THRESHOLD - Speed + 1), ?MAX_SPEED - Speed).
+    integer(max(1, ?SLOW_THRESHOLD - Speed + 1), ?MAX_SPEED - Speed).
 
 braker(Speed, stopped) ->
-  exactly(Speed);
+    exactly(Speed);
 braker(Speed, slow) ->
-  integer(max(1, Speed - ?SLOW_THRESHOLD + 1), Speed - 1);
+    integer(max(1, Speed - ?SLOW_THRESHOLD + 1), Speed - 1);
 braker(Speed, fast) ->
-  integer(1, Speed - ?SLOW_THRESHOLD - 1).
+    integer(1, Speed - ?SLOW_THRESHOLD - 1).
 
 traveler() -> integer(1, 100).
 
@@ -206,98 +206,98 @@ refueler(Fuel) -> integer(0, round(?MAX_FUEL - Fuel)).
 initial_state() -> stopped.
 
 initial_state_data() ->
-  #test_state{fuel     = ?MAX_FUEL,
-              speed    = 0,
-              burnt    = 0,
-              distance = 0}.
+    #test_state{fuel     = ?MAX_FUEL,
+                speed    = 0,
+                burnt    = 0,
+                distance = 0}.
 
 stopped(S) ->
-  #test_state{fuel = Fuel, speed = Speed} = S,
-  accelerate_commands(Speed) ++
-    [{history, ?CALL(refuel, [refueler(Fuel)])}
-     || Fuel < ?MAX_FUEL - 1].
+    #test_state{fuel = Fuel, speed = Speed} = S,
+    accelerate_commands(Speed) ++
+        [{history, ?CALL(refuel, [refueler(Fuel)])}
+         || Fuel < ?MAX_FUEL - 1].
 
 slow(S) ->
-  #test_state{fuel = Fuel, speed = Speed} = S,
-  accelerate_commands(Speed) ++
-    brake_commands(Speed) ++
-    [{history, ?CALL(travel, [traveler()])},
-     {stopped, ?CALL(refuel, [refueler(Fuel)])}].
+    #test_state{fuel = Fuel, speed = Speed} = S,
+    accelerate_commands(Speed) ++
+        brake_commands(Speed) ++
+        [{history, ?CALL(travel, [traveler()])},
+         {stopped, ?CALL(refuel, [refueler(Fuel)])}].
 
 fast(S) ->
-  #test_state{fuel = Fuel, speed = Speed} = S,
-  accelerate_commands(Speed) ++
-    brake_commands(Speed) ++
-    [{history, ?CALL(travel, [traveler()])},
-     {stopped, ?CALL(refuel, [refueler(Fuel)])}].
+    #test_state{fuel = Fuel, speed = Speed} = S,
+    accelerate_commands(Speed) ++
+        brake_commands(Speed) ++
+        [{history, ?CALL(travel, [traveler()])},
+         {stopped, ?CALL(refuel, [refueler(Fuel)])}].
 
 precondition(stopped, stopped, _S, ?CALL(refuel, _)) ->
-  true;
+    true;
 precondition(_, NextState, S, ?CALL(accelerate, [Value])) ->
-  #test_state{fuel = Fuel, speed = Speed} = S,
-  Speed < ?MAX_SPEED andalso
-    Fuel > ?MAX_FUEL * 0.1 andalso
-    state_name(Speed + Value) =:= NextState;
+    #test_state{fuel = Fuel, speed = Speed} = S,
+    Speed < ?MAX_SPEED andalso
+        Fuel > ?MAX_FUEL * 0.1 andalso
+        state_name(Speed + Value) =:= NextState;
 precondition(_, NextState, S, ?CALL(brake, [Value])) ->
-  #test_state{speed = Speed} = S,
-  state_name(Speed - Value) =:= NextState;
+    #test_state{speed = Speed} = S,
+    state_name(Speed - Value) =:= NextState;
 precondition(PrevState, NextState, S, ?CALL(travel, _)) ->
-  #test_state{speed = Speed} = S,
-  Speed > 20 andalso PrevState =:= NextState;
+    #test_state{speed = Speed} = S,
+    Speed > 20 andalso PrevState =:= NextState;
 precondition(_, stopped, S, ?CALL(refuel, _)) ->
-  #test_state{fuel = Fuel} = S,
-  Fuel < ?MAX_FUEL * 0.8;
+    #test_state{fuel = Fuel} = S,
+    Fuel < ?MAX_FUEL * 0.8;
 precondition(_, _, _, _) ->
-  false.
+    false.
 
 next_state_data(_, _, S, _, ?CALL(accelerate, [Value])) ->
-  #test_state{fuel = Fuel,
-              speed = Speed,
-              distance = Distance,
-              burnt = B} = S,
-  Calc = acceleration_calculations(Speed, Value, Fuel),
-  {Travelled, Acceleration, Burnt} = Calc,
-  S#test_state{fuel = Fuel - Burnt,
-               speed = Speed + Acceleration,
-               distance = Distance + Travelled,
-               burnt = B + Burnt};
+    #test_state{fuel = Fuel,
+                speed = Speed,
+                distance = Distance,
+                burnt = B} = S,
+    Calc = acceleration_calculations(Speed, Value, Fuel),
+    {Travelled, Acceleration, Burnt} = Calc,
+    S#test_state{fuel = Fuel - Burnt,
+                 speed = Speed + Acceleration,
+                 distance = Distance + Travelled,
+                 burnt = B + Burnt};
 next_state_data(_, _, S, _, ?CALL(brake, [Value])) ->
-  #test_state{fuel = Fuel,
-              speed = Speed,
-              distance = Distance,
-              burnt = B} = S,
-  Calc = acceleration_calculations(Speed, -Value, Fuel),
-  {Travelled, Acceleration, Burnt} = Calc,
-  S#test_state{fuel = Fuel - Burnt,
-               speed = Speed + Acceleration,
-               distance = Distance + Travelled,
-               burnt = B + Burnt};
+    #test_state{fuel = Fuel,
+                speed = Speed,
+                distance = Distance,
+                burnt = B} = S,
+    Calc = acceleration_calculations(Speed, -Value, Fuel),
+    {Travelled, Acceleration, Burnt} = Calc,
+    S#test_state{fuel = Fuel - Burnt,
+                 speed = Speed + Acceleration,
+                 distance = Distance + Travelled,
+                 burnt = B + Burnt};
 next_state_data(_, _, S, _, ?CALL(travel, [Value])) ->
-  #test_state{fuel = Fuel,
-              speed = Speed,
-              distance = Distance,
-              burnt = B} = S,
-  {Travelled, Burnt} = travel_calculations(Value, Speed, Fuel),
-  S#test_state{fuel = Fuel - Burnt,
-               distance = Distance + Travelled,
-               burnt = B + Burnt};
+    #test_state{fuel = Fuel,
+                speed = Speed,
+                distance = Distance,
+                burnt = B} = S,
+    {Travelled, Burnt} = travel_calculations(Value, Speed, Fuel),
+    S#test_state{fuel = Fuel - Burnt,
+                 distance = Distance + Travelled,
+                 burnt = B + Burnt};
 next_state_data(_, _, S, _, ?CALL(refuel, [Value])) ->
-  #test_state{fuel = Fuel,
-              speed = Speed,
-              distance = Distance,
-              burnt = B} = S,
-  Calc = acceleration_calculations(Speed, -Speed, Fuel),
-  {Travelled, Acceleration, Burnt} = Calc,
-  S#test_state{fuel = min(?MAX_FUEL, Fuel - Burnt + Value),
-               speed = Speed + Acceleration,
-               distance = Distance + Travelled,
-               burnt = B + Burnt}.
+    #test_state{fuel = Fuel,
+                speed = Speed,
+                distance = Distance,
+                burnt = B} = S,
+    Calc = acceleration_calculations(Speed, -Speed, Fuel),
+    {Travelled, Acceleration, Burnt} = Calc,
+    S#test_state{fuel = min(?MAX_FUEL, Fuel - Burnt + Value),
+                 speed = Speed + Acceleration,
+                 distance = Distance + Travelled,
+                 burnt = B + Burnt}.
 
 postcondition(_, _, S, _, {D, B}) when D >= 0, B >= 0 ->
-  #test_state{distance = Distance} = S,
-  Distance + D < ?DISTANCE;
+    #test_state{distance = Distance} = S,
+    Distance + D < ?DISTANCE;
 postcondition(_, _, _S, _, _R) ->
-  false.
+    false.
 
 
 %% -----------------------------------------------------------------------------
@@ -306,16 +306,16 @@ postcondition(_, _, _S, _, _R) ->
 
 
 accelerate_commands(Speed) ->
-  [{slow, ?CALL(accelerate, [accelerator(Speed, slow)])}
-   || Speed < ?SLOW_THRESHOLD] ++
-    [{fast, ?CALL(accelerate, [accelerator(Speed, fast)])}
-     || Speed < ?MAX_SPEED].
+    [{slow, ?CALL(accelerate, [accelerator(Speed, slow)])}
+     || Speed < ?SLOW_THRESHOLD] ++
+        [{fast, ?CALL(accelerate, [accelerator(Speed, fast)])}
+         || Speed < ?MAX_SPEED].
 
 brake_commands(Speed) ->
-  [{stopped, ?CALL(brake, [braker(Speed, stopped)])}] ++
-    [{slow, ?CALL(brake, [braker(Speed, slow)])} || Speed > 1] ++
-    [{fast, ?CALL(brake, [braker(Speed, fast)])}
-     || Speed > ?SLOW_THRESHOLD + 1].
+    [{stopped, ?CALL(brake, [braker(Speed, stopped)])}] ++
+        [{slow, ?CALL(brake, [braker(Speed, slow)])} || Speed > 1] ++
+        [{fast, ?CALL(brake, [braker(Speed, fast)])}
+         || Speed > ?SLOW_THRESHOLD + 1].
 
 
 %% -----------------------------------------------------------------------------
@@ -325,54 +325,54 @@ brake_commands(Speed) ->
 
 %% Vanilla property based testing. This should not fail consistently.
 prop_distance() ->
-  ?FORALL(
-     Cmds, proper_fsm:commands(?MODULE),
-     ?TRAPEXIT(
-        begin
-          start_link(),
-          {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
-          stop(),
-          ?WHENFAIL(
-             on_failure(H, S, R),
-             aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                       R =:= ok))
-        end)).
+    ?FORALL(
+       Cmds, proper_fsm:commands(?MODULE),
+       ?TRAPEXIT(
+          begin
+              start_link(),
+              {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
+              stop(),
+              ?WHENFAIL(
+                 on_failure(H, S, R),
+                 aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                           R =:= ok))
+          end)).
 
 %% Targeted property based testing, where maximizing the distance travelled
 %% provides failing command sequencies more consistently.
 prop_distance_targeted() ->
-  ?FORALL_TARGETED(
-     Cmds, proper_fsm:targeted_commands(?MODULE),
-     ?TRAPEXIT(
-        begin
-          start_link(),
-          {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
-          stop(),
-          #test_state{distance = Distance} = S,
-          ?MAXIMIZE(Distance),
-          ?WHENFAIL(
-             on_failure(H, S, R),
-             aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                       R =:= ok))
-        end)).
+    ?FORALL_TARGETED(
+       Cmds, proper_fsm:targeted_commands(?MODULE),
+       ?TRAPEXIT(
+          begin
+              start_link(),
+              {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
+              stop(),
+              #test_state{distance = Distance} = S,
+              ?MAXIMIZE(Distance),
+              ?WHENFAIL(
+                 on_failure(H, S, R),
+                 aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                           R =:= ok))
+          end)).
 
 %% This is the same as the above but manually providing the initial state.
 prop_distance_targeted_init() ->
-  State = {initial_state(), initial_state_data()},
-  ?FORALL_TARGETED(
-     Cmds, proper_fsm:targeted_commands(?MODULE, State),
-     ?TRAPEXIT(
-        begin
-          start_link(),
-          {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
-          stop(),
-          #test_state{distance = Distance} = S,
-          ?MAXIMIZE(Distance),
-          ?WHENFAIL(
-             on_failure(H, S, R),
-             aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
-                       R =:= ok))
-        end)).
+    State = {initial_state(), initial_state_data()},
+    ?FORALL_TARGETED(
+       Cmds, proper_fsm:targeted_commands(?MODULE, State),
+       ?TRAPEXIT(
+          begin
+              start_link(),
+              {H, {_, S}, R} = proper_fsm:run_commands(?MODULE, Cmds),
+              stop(),
+              #test_state{distance = Distance} = S,
+              ?MAXIMIZE(Distance),
+              ?WHENFAIL(
+                 on_failure(H, S, R),
+                 aggregate(zip(proper_fsm:state_names(H), command_names(Cmds)),
+                           R =:= ok))
+          end)).
 
 
 %% -----------------------------------------------------------------------------
@@ -387,10 +387,10 @@ state_name(_S) -> fast.
 
 %% Function to be called when the property fails.
 on_failure(History, State, {postcondition, false}) ->
-  [{_, {D, B}} | _] = lists:reverse(History),
-  Distance = State#test_state.distance + D,
-  Burnt = State#test_state.burnt + B,
-  Consumption = calculate_consumption(Distance, Burnt),
-  io:format("Distance: ~w~nConsumption: ~w~n", [Distance, Consumption]);
+    [{_, {D, B}} | _] = lists:reverse(History),
+    Distance = State#test_state.distance + D,
+    Burnt = State#test_state.burnt + B,
+    Consumption = calculate_consumption(Distance, Burnt),
+    io:format("Distance: ~w~nConsumption: ~w~n", [Distance, Consumption]);
 on_failure(_History, _State, Result) ->
-  io:format("Result: ~p~n", [Result]).
+    io:format("Result: ~p~n", [Result]).

@@ -45,40 +45,40 @@
 
 
 unique_key(S) ->
-  ?SUCHTHAT(I, integer(1, 100),
-            length(lists:filter(fun ({K, _}) -> K =:= I end, S)) =:= 0).
+    ?SUCHTHAT(I, integer(1, 100),
+              length(lists:filter(fun ({K, _}) -> K =:= I end, S)) =:= 0).
 key(S) ->
-  oneof([oneof([Key || {Key, _} <- S]),
-         unique_key(S)]).
+    oneof([oneof([Key || {Key, _} <- S]),
+           unique_key(S)]).
 value() ->
-  integer().
+    integer().
 
 initial_state() -> [].
 
 command([]) ->
-  {call, ets, insert, [?TAB, {unique_key([]), value()}]};
+    {call, ets, insert, [?TAB, {unique_key([]), value()}]};
 command(S) ->
-  oneof([{call, ets, insert, [?TAB, {key(S), value()}]},
-         {call, ets, lookup, [?TAB, key(S)]},
-         {call, ets, delete_all_objects, [?TAB]}]).
+    oneof([{call, ets, insert, [?TAB, {key(S), value()}]},
+           {call, ets, lookup, [?TAB, key(S)]},
+           {call, ets, delete_all_objects, [?TAB]}]).
 
 precondition(_S, _C) -> true.
 
 next_state(S, _V, {call, ets, insert, [_, {Key, Value}]}) ->
-  case proplists:is_defined(Key, S) of
-    true -> lists:keyreplace(Key, 1, S, {Key, Value});
-    false -> [{Key, Value} | S]
-  end;
+    case proplists:is_defined(Key, S) of
+        true -> lists:keyreplace(Key, 1, S, {Key, Value});
+        false -> [{Key, Value} | S]
+    end;
 next_state(S, _V, {call, ets, lookup, _}) -> S;
 next_state(_S, _V, {call, ets, delete_all_objects, [_]}) -> [].
 
 postcondition(S, {call, ets, insert, [_, {Key, _Value}]}, _R) ->
-  case proplists:is_defined(Key, S) of
-    true -> true;
-    false -> length(S) + 1 < ?MAX_SIZE
-  end;
+    case proplists:is_defined(Key, S) of
+        true -> true;
+        false -> length(S) + 1 < ?MAX_SIZE
+    end;
 postcondition(S, {call, ets, lookup, [_, Key]}, R) ->
-  proplists:lookup_all(Key, S) =:= R;
+    proplists:lookup_all(Key, S) =:= R;
 postcondition(_S, _C, _R) -> true.
 
 
@@ -88,33 +88,33 @@ postcondition(_S, _C, _R) -> true.
 
 
 prop_random() ->
-  ?FORALL(Cmds, commands(?MODULE),
-          begin
-            catch ets:delete(?TAB),
-            ?TAB = ets:new(?TAB, [set, public, named_table]),
-            {_H, _S, Res} = run_commands(?MODULE, Cmds),
-            ets:delete(?TAB),
-            aggregate(command_names(Cmds), Res =:= ok)
-          end).
+    ?FORALL(Cmds, commands(?MODULE),
+            begin
+                catch ets:delete(?TAB),
+                ?TAB = ets:new(?TAB, [set, public, named_table]),
+                {_H, _S, Res} = run_commands(?MODULE, Cmds),
+                ets:delete(?TAB),
+                aggregate(command_names(Cmds), Res =:= ok)
+            end).
 
 prop_targeted() ->
-  ?FORALL_TARGETED(Cmds, targeted_commands(?MODULE),
-                   begin
-                     catch ets:delete(?TAB),
-                     ?TAB = ets:new(?TAB, [set, public, named_table]),
-                     {_H, S, Res} = run_commands(?MODULE, Cmds),
-                     ets:delete(?TAB),
-                     ?MAXIMIZE(length(S)),
-                     aggregate(command_names(Cmds), Res =:= ok)
-                   end).
+    ?FORALL_TARGETED(Cmds, targeted_commands(?MODULE),
+                     begin
+                         catch ets:delete(?TAB),
+                         ?TAB = ets:new(?TAB, [set, public, named_table]),
+                         {_H, S, Res} = run_commands(?MODULE, Cmds),
+                         ets:delete(?TAB),
+                         ?MAXIMIZE(length(S)),
+                         aggregate(command_names(Cmds), Res =:= ok)
+                     end).
 
 prop_targeted_init() ->
-  ?FORALL_TARGETED(Cmds, targeted_commands(?MODULE, []),
-                   begin
-                     catch ets:delete(?TAB),
-                     ?TAB = ets:new(?TAB, [set, public, named_table]),
-                     {_H, S, Res} = run_commands(?MODULE, Cmds),
-                     ets:delete(?TAB),
-                     ?MAXIMIZE(length(S)),
-                     aggregate(command_names(Cmds), Res =:= ok)
-                   end).
+    ?FORALL_TARGETED(Cmds, targeted_commands(?MODULE, []),
+                     begin
+                         catch ets:delete(?TAB),
+                         ?TAB = ets:new(?TAB, [set, public, named_table]),
+                         {_H, S, Res} = run_commands(?MODULE, Cmds),
+                         ets:delete(?TAB),
+                         ?MAXIMIZE(length(S)),
+                         aggregate(command_names(Cmds), Res =:= ok)
+                     end).

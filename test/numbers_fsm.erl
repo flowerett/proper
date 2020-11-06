@@ -31,7 +31,7 @@
 -export([zero/1, one/1, two/1, three/1, four/1, num/4]).
 -export([idle/0, inc/0, dec/0, insert/1, delete/1]).
 -export([initial_state/0, initial_state_data/0, precondition/4,
-	 postcondition/5, weight/3, next_state_data/5]).
+         postcondition/5, weight/3, next_state_data/5]).
 
 -include_lib("proper/include/proper.hrl").
 
@@ -44,45 +44,45 @@
 
 zero(S) ->
     idle_transition() ++
-	[{four, {call,?MODULE,dec,[]}},
-	 {one, {call,?MODULE,inc,[]}},
-	 {history, {call,?MODULE,insert,[key()]}},
-	 {history, {call,?MODULE,delete,[key(S)]}}].
+        [{four, {call,?MODULE,dec,[]}},
+         {one, {call,?MODULE,inc,[]}},
+         {history, {call,?MODULE,insert,[key()]}},
+         {history, {call,?MODULE,delete,[key(S)]}}].
 
 one(S) ->
     idle_transition() ++
-	[{zero, {call,?MODULE,dec,[]}},
-	 {two, {call,?MODULE,inc,[]}},
-	 {history, {call,?MODULE,insert,[key()]}},
-	 {history, {call,?MODULE,delete,[key(S)]}}].
+        [{zero, {call,?MODULE,dec,[]}},
+         {two, {call,?MODULE,inc,[]}},
+         {history, {call,?MODULE,insert,[key()]}},
+         {history, {call,?MODULE,delete,[key(S)]}}].
 
 two(S) ->
     idle_transition() ++
-	[{one, {call,?MODULE,dec,[]}},
-	 {three, {call,?MODULE,inc,[]}},
-	 {history, {call,?MODULE,insert,[key()]}},
-	 {history, {call,?MODULE,delete,[key(S)]}}].
+        [{one, {call,?MODULE,dec,[]}},
+         {three, {call,?MODULE,inc,[]}},
+         {history, {call,?MODULE,insert,[key()]}},
+         {history, {call,?MODULE,delete,[key(S)]}}].
 
 three(S) ->
     idle_transition() ++
-	[{two, {call,?MODULE,dec,[]}},
-	 {four, {call,?MODULE,inc,[]}},
-	 {history, {call,?MODULE,insert,[key()]}},
-	 {history, {call,?MODULE,delete,[key(S)]}}].
+        [{two, {call,?MODULE,dec,[]}},
+         {four, {call,?MODULE,inc,[]}},
+         {history, {call,?MODULE,insert,[key()]}},
+         {history, {call,?MODULE,delete,[key(S)]}}].
 
 four(S) ->
-     idle_transition() ++
-	[{three, {call,?MODULE,dec,[]}},
-	 {zero, {call,?MODULE,inc,[]}},
-	 {history, {call,?MODULE,insert,[key()]}},
-	 {history, {call,?MODULE,delete,[key(S)]}}].
+    idle_transition() ++
+        [{three, {call,?MODULE,dec,[]}},
+         {zero, {call,?MODULE,inc,[]}},
+         {history, {call,?MODULE,insert,[key()]}},
+         {history, {call,?MODULE,delete,[key(S)]}}].
 
 num(N, _, _, _S) ->
     idle_transition() ++
-	[{{num,N+1,dummy,dummy}, {call,?MODULE,inc,[]}} || N < 4] ++
-	[{{num,N-1,dummy,dummy}, {call,?MODULE,dec,[]}} || N > 0] ++
-	[{{num,0,dummy,dummy}, {call,?MODULE,inc,[]}} || N =:= 4] ++
-	[{{num,4,dummy,dummy}, {call,?MODULE,dec,[]}} || N =:= 0].
+        [{{num,N+1,dummy,dummy}, {call,?MODULE,inc,[]}} || N < 4] ++
+        [{{num,N-1,dummy,dummy}, {call,?MODULE,dec,[]}} || N > 0] ++
+        [{{num,0,dummy,dummy}, {call,?MODULE,inc,[]}} || N =:= 4] ++
+        [{{num,4,dummy,dummy}, {call,?MODULE,dec,[]}} || N =:= 0].
 
 idle_transition() ->
     [{history, {call,?MODULE,idle,[]}}].
@@ -147,41 +147,41 @@ delete(_) -> ok.
 
 prop_target_states_atom() ->
     ?FORALL([From,Call], [elements(?STATES),call()],
-	    begin
-		Res = proper_fsm:target_states(?MODULE, From, [], Call),
-		{call,_,Action,[]} = Call,
-		Target = case Action of
-			     idle ->
-				 [history];
-			     inc ->
-				 Sum = mod_add(proplists:get_value(From, ?LOOKUP), 1),
-				 [element(1, lists:keyfind(Sum, 2, ?LOOKUP))];
-			     dec ->
-				 Diff = mod_sub(proplists:get_value(From, ?LOOKUP), 1),
-				 [element(1, lists:keyfind(Diff, 2, ?LOOKUP))];
-			     foo ->
-				 []
-			 end,
-		collect({From,Action}, Target =:= Res)
-	    end).
+            begin
+                Res = proper_fsm:target_states(?MODULE, From, [], Call),
+                {call,_,Action,[]} = Call,
+                Target = case Action of
+                             idle ->
+                                 [history];
+                             inc ->
+                                 Sum = mod_add(proplists:get_value(From, ?LOOKUP), 1),
+                                 [element(1, lists:keyfind(Sum, 2, ?LOOKUP))];
+                             dec ->
+                                 Diff = mod_sub(proplists:get_value(From, ?LOOKUP), 1),
+                                 [element(1, lists:keyfind(Diff, 2, ?LOOKUP))];
+                             foo ->
+                                 []
+                         end,
+                collect({From,Action}, Target =:= Res)
+            end).
 
 prop_target_states_tuple() ->
     ?FORALL([From,Call], [{num,range(0,4),dummy,dummy},call()],
-	    begin
-		{num,N,_,_} = From,
-		Res = proper_fsm:target_states(?MODULE, From, dummy, Call),
-		{call,_,Action,[]} = Call,
-		Target = case Action of
-			     idle ->
-				 [history];
-			     inc ->
-				 Sum = mod_add(N, 1),
-				 [{num,Sum,dummy,dummy}];
-			     dec ->
-				 Diff = mod_sub(N, 1),
-				 [{num,Diff,dummy,dummy}];
-			     foo ->
-				 []
-			 end,
-		collect({From,Action}, Target =:= Res)
-	    end).
+            begin
+                {num,N,_,_} = From,
+                Res = proper_fsm:target_states(?MODULE, From, dummy, Call),
+                {call,_,Action,[]} = Call,
+                Target = case Action of
+                             idle ->
+                                 [history];
+                             inc ->
+                                 Sum = mod_add(N, 1),
+                                 [{num,Sum,dummy,dummy}];
+                             dec ->
+                                 Diff = mod_sub(N, 1),
+                                 [{num,Diff,dummy,dummy}];
+                             foo ->
+                                 []
+                         end,
+                collect({From,Action}, Target =:= Res)
+            end).

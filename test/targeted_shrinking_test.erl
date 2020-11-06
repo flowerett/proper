@@ -37,93 +37,93 @@
 %% -----------------------------------------------------------------------------
 
 let_int() ->
-  ?LET(I, integer(), I).
+    ?LET(I, integer(), I).
 
 nf_let_int() ->
-  fun (Prev, _T) ->
-      ?LET(I, integer(Prev, inf), I)
-  end.
+    fun (Prev, _T) ->
+            ?LET(I, integer(Prev, inf), I)
+    end.
 
 nf_int_shrink() ->
-  fun (Prev, _T) ->
-      ?SHRINK(integer(Prev, inf), [integer()])
-  end.
+    fun (Prev, _T) ->
+            ?SHRINK(integer(Prev, inf), [integer()])
+    end.
 
 int_user_nf() ->
-  ?USERNF(integer(), nf_let_int()).
+    ?USERNF(integer(), nf_let_int()).
 
 let_int_user_nf() ->
-  ?USERNF(let_int(), nf_let_int()).
+    ?USERNF(let_int(), nf_let_int()).
 
 int_user_nf_shrink_inner() ->
-  ?USERNF(let_int(), nf_int_shrink()).
+    ?USERNF(let_int(), nf_int_shrink()).
 
 int_user_nf_shrink_outer() ->
-  ?USERNF(?SHRINK(let_int(), [integer()]),
-          fun(Prev, _T) -> integer(Prev, inf) end).
+    ?USERNF(?SHRINK(let_int(), [integer()]),
+            fun(Prev, _T) -> integer(Prev, inf) end).
 
 normal_list() ->
-  list(integer()).
+    list(integer()).
 
 let_list() ->
-  ?LET(L, list(integer()), L).
+    ?LET(L, list(integer()), L).
 
 nf_list() ->
-  fun (Prev, _T) ->
-      {Max, NewLen} = case Prev of
-                        [] -> {0, 1};
-                        _ -> {max(0, lists:max(Prev)), length(Prev)}
-                      end,
-      ?SHRINK(vector(NewLen * 2, integer(Max, inf)),
-              [list(integer())])
-  end.
+    fun (Prev, _T) ->
+            {Max, NewLen} = case Prev of
+                                [] -> {0, 1};
+                                _ -> {max(0, lists:max(Prev)), length(Prev)}
+                            end,
+            ?SHRINK(vector(NewLen * 2, integer(Max, inf)),
+                    [list(integer())])
+    end.
 
 normal_list_user_nf() ->
-  ?USERNF(normal_list(), nf_list()).
+    ?USERNF(normal_list(), nf_list()).
 
 let_list_user_nf() ->
-  ?USERNF(let_list(), nf_list()).
+    ?USERNF(let_list(), nf_list()).
 
 %% -----------------------------------------------------------------------------
 %% Properties
 %% -----------------------------------------------------------------------------
 
 property_int(I) ->
-  ?MAXIMIZE(I),
-  I < 500.
+    ?MAXIMIZE(I),
+    I < 500.
 
 prop_int() ->
-  ?FORALL_TARGETED(I, int_user_nf(), property_int(I)).
+    ?FORALL_TARGETED(I, int_user_nf(), property_int(I)).
 
 prop_let_int() ->
-  ?FORALL_TARGETED(I, let_int_user_nf(), property_int(I)).
+    ?FORALL_TARGETED(I, let_int_user_nf(), property_int(I)).
 
 prop_int_shrink_outer() ->
-  ?FORALL_TARGETED(I, int_user_nf_shrink_outer(), property_int(I)).
+    ?FORALL_TARGETED(I, int_user_nf_shrink_outer(), property_int(I)).
 
 prop_int_shrink_inner() ->
-  ?FORALL_TARGETED(I, int_user_nf_shrink_inner(), property_int(I)).
+    ?FORALL_TARGETED(I, int_user_nf_shrink_inner(), property_int(I)).
 
 property_list(L) ->
-  ?MAXIMIZE(lists:sum(L)),
-  lists:sum(L) < 1000.
+    ?MAXIMIZE(lists:sum(L)),
+    lists:sum(L) < 1000.
 
 prop_normal_list() ->
-  ?FORALL_TARGETED(L, normal_list_user_nf(), property_list(L)).
+    ?FORALL_TARGETED(L, normal_list_user_nf(), property_list(L)).
 
 prop_let_list() ->
-  ?FORALL_TARGETED(L, let_list_user_nf(), property_list(L)).
+    ?FORALL_TARGETED(L, let_list_user_nf(), property_list(L)).
 
 %% -----------------------------------------------------------------------------
 %% Tests
 %% -----------------------------------------------------------------------------
 
 normal_list_test() ->
-  false = proper:quickcheck(prop_normal_list()),
-  [L] = proper:counterexample(),
-  ?_assert(lists:sum(L) =:= 1000).
+    false = proper:quickcheck(prop_normal_list()),
+    [L] = proper:counterexample(),
+    ?_assert(lists:sum(L) =:= 1000).
 
 let_list_test() ->
-  false = proper:quickcheck(prop_let_list()),
-  [L] = proper:counterexample(),
-  ?_assert(lists:sum(L) =:= 1000).
+    false = proper:quickcheck(prop_let_list()),
+    [L] = proper:counterexample(),
+    ?_assert(lists:sum(L) =:= 1000).

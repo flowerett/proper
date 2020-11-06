@@ -47,26 +47,26 @@
 %%
 
 not_handled() ->
-  Beams = filelib:wildcard("ebin/*.beam"),   % eunit executes from the top dir
-  MTs = lists:flatmap(fun get_exported_types/1, Beams),
-  R = [{M,T,A,proper_typeserver:demo_translate_type(M, stringify(T, A))}
-       || {M,T,A} <- MTs],
-  {OKs,Errors} = lists:partition(fun type_translation_is_ok/1, R),
-  {[Inst || TGen <- OKs, (Inst = pick_instance(TGen)) =/= ok], length(Errors)}.
+    Beams = filelib:wildcard("ebin/*.beam"),   % eunit executes from the top dir
+    MTs = lists:flatmap(fun get_exported_types/1, Beams),
+    R = [{M,T,A,proper_typeserver:demo_translate_type(M, stringify(T, A))}
+         || {M,T,A} <- MTs],
+    {OKs,Errors} = lists:partition(fun type_translation_is_ok/1, R),
+    {[Inst || TGen <- OKs, (Inst = pick_instance(TGen)) =/= ok], length(Errors)}.
 
 pick_instance({M,T,A,{ok,Gen}}) ->
-  {ok,Inst} = proper_gen:pick(Gen),
-  ok = proper:global_state_erase(),
-  case Inst of
-    {'$call',_Mod,_Fun,_Args} -> ok; % TODO: handle symbolic instances
-      %% try proper_symb:eval(Inst)
-      %% catch _ -> io:format("~p~n", [{M,T,A}]), Inst end;
-    _ ->
-      case proper_typeserver:demo_is_instance(Inst, M, stringify(T, A)) of
-	true  -> ok;
-        false -> {M,T,A,Inst,Gen}
-      end
-  end.
+    {ok,Inst} = proper_gen:pick(Gen),
+    ok = proper:global_state_erase(),
+    case Inst of
+        {'$call',_Mod,_Fun,_Args} -> ok; % TODO: handle symbolic instances
+        %% try proper_symb:eval(Inst)
+        %% catch _ -> io:format("~p~n", [{M,T,A}]), Inst end;
+        _ ->
+            case proper_typeserver:demo_is_instance(Inst, M, stringify(T, A)) of
+                true  -> ok;
+                false -> {M,T,A,Inst,Gen}
+            end
+    end.
 
 type_translation_is_ok({_M,_T,_A,{error,_}}) -> false;
 type_translation_is_ok({_M,_T,_A,{ok,{'$type',_}}}) -> true.
@@ -77,6 +77,6 @@ stringify(T, 1) -> atom_to_list(T)++"(any())";
 stringify(T, 2) -> atom_to_list(T)++"(any(),any())".
 
 get_exported_types(Beam) ->
-  {ok,{M,[{abstract_code,{_,AC}}]}} = beam_lib:chunks(Beam, [abstract_code]),
-  ExpTypes = lists:append([TList || {attribute,_,export_type,TList} <- AC]),
-  [{M,T,A} || {T,A} <- ExpTypes].
+    {ok,{M,[{abstract_code,{_,AC}}]}} = beam_lib:chunks(Beam, [abstract_code]),
+    ExpTypes = lists:append([TList || {attribute,_,export_type,TList} <- AC]),
+    [{M,T,A} || {T,A} <- ExpTypes].

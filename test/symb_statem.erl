@@ -29,15 +29,15 @@
 -behaviour(proper_statem).
 
 -export([command/1,
-	 initial_state/0, next_state/3,
-	 precondition/2, postcondition/3]).
+         initial_state/0, next_state/3,
+         precondition/2, postcondition/3]).
 -export([foo/1, bar/1]).
 -export([prop_simple/0, prop_parallel_simple/0]).
 
 -include_lib("proper/include/proper.hrl").
 
 -record(state, {foo = [] :: list(),
-		bar = [] :: list()}).
+                bar = [] :: list()}).
 -type state() :: #state{}.
 
 -spec initial_state() -> state().
@@ -46,7 +46,7 @@ initial_state() ->
 
 command(_S) ->
     oneof([{call,?MODULE,foo,[integer()]},
-	   {call,?MODULE,bar,[integer()]}]).
+           {call,?MODULE,bar,[integer()]}]).
 
 precondition(_, _) ->
     true.
@@ -73,18 +73,18 @@ bar(I) when is_integer(I) ->
 
 prop_simple() ->
     ?FORALL(Cmds, commands(?MODULE),
-	    begin
-		{H,S,Res} = run_commands(?MODULE, Cmds),
-		?WHENFAIL(
-		   io:format("H: ~w\nState: ~w\n:Res: ~w\n", [H,S,Res]),
-		   Res =:= ok)
-	    end).
+            begin
+                {H,S,Res} = run_commands(?MODULE, Cmds),
+                ?WHENFAIL(
+                   io:format("H: ~w\nState: ~w\n:Res: ~w\n", [H,S,Res]),
+                   Res =:= ok)
+            end).
 
 prop_parallel_simple() ->
     ?FORALL(Cmds, parallel_commands(?MODULE),
-	    begin
-		{S,P,Res} = run_parallel_commands(?MODULE, Cmds),
-		?WHENFAIL(
-		   io:format("Seq: ~w\nParallel: ~w\n:Res: ~w\n", [S,P,Res]),
-		   Res =:= ok)
-	    end).
+            begin
+                {S,P,Res} = run_parallel_commands(?MODULE, Cmds),
+                ?WHENFAIL(
+                   io:format("Seq: ~w\nParallel: ~w\n:Res: ~w\n", [S,P,Res]),
+                   Res =:= ok)
+            end).

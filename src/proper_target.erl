@@ -115,15 +115,15 @@
 -callback init_target(proper_types:type(), next_fun()) -> target_state().
 %% next function
 -callback next(target_state(), strategy_data()) ->
-  {proper_gen:instance(), target_state(), strategy_data()}.
+    {proper_gen:instance(), target_state(), strategy_data()}.
 %% shrinker
 -callback get_shrinker(target_state(), strategy_data()) -> proper_types:type().
 %% update the strategy with the fitness
 -callback update_fitness(fitness(), target_state(), strategy_data()) ->
-  {target_state(), strategy_data()}.
+    {target_state(), strategy_data()}.
 %% reset strat
 -callback reset(target_state(), strategy_data()) ->
-  {target_state(), strategy_data()}.
+    {target_state(), strategy_data()}.
 
 
 %% -----------------------------------------------------------------------------
@@ -134,64 +134,64 @@
 
 -spec init_strategy(opts()) -> ok.
 init_strategy(#{search_steps := Steps, search_strategy := Strat}) ->
-  Strategy = strategy(Strat),
-  proper_gen_next:init(),
-  Data = Strategy:init_strategy(Steps),
-  Args = [{Strategy, Data}],
-  {ok, TargetserverPid} = gen_server:start_link(?MODULE, Args, []),
-  put('$targetserver_pid', TargetserverPid),
-  update_pdict(),
-  ok.
+    Strategy = strategy(Strat),
+    proper_gen_next:init(),
+    Data = Strategy:init_strategy(Steps),
+    Args = [{Strategy, Data}],
+    {ok, TargetserverPid} = gen_server:start_link(?MODULE, Args, []),
+    put('$targetserver_pid', TargetserverPid),
+    update_pdict(),
+    ok.
 
 %% @doc Cleans up proper_gen_next as well as stopping the gen_server.
 
 -spec cleanup_strategy() -> ok.
 cleanup_strategy() ->
-  case erase('$targetserver_pid') of
-    undefined -> ok;
-    TargetserverPid ->
-      proper_gen_next:cleanup(),
-      gen_server:stop(TargetserverPid)
-  end.
+    case erase('$targetserver_pid') of
+        undefined -> ok;
+        TargetserverPid ->
+            proper_gen_next:cleanup(),
+            gen_server:stop(TargetserverPid)
+    end.
 
 %% This is used to create the targeted generator.
 
 %% @private
 -spec targeted(proper_types:type()) -> proper_types:type().
 targeted(RawType) ->
-  Type = proper_types:cook_outer(RawType),
-  TargetedType = ?SHRINK(proper_types:exactly(?LAZY(targeted_gen())),
-                         [get_shrinker(Type)]),
-  case proper_types:find_prop(user_nf, Type) of
-    {ok, _} -> proper_types:add_prop(is_user_nf, true, TargetedType);
-    error -> proper_types:add_prop(is_user_nf, false, TargetedType)
-  end.
+    Type = proper_types:cook_outer(RawType),
+    TargetedType = ?SHRINK(proper_types:exactly(?LAZY(targeted_gen())),
+                           [get_shrinker(Type)]),
+    case proper_types:find_prop(user_nf, Type) of
+        {ok, _} -> proper_types:add_prop(is_user_nf, true, TargetedType);
+        error -> proper_types:add_prop(is_user_nf, false, TargetedType)
+    end.
 
 %% Update the gen_server's process dictionary with some of
 %% PropEr's values in its process dictionary.
 
 update_pdict() ->
-  TargetserverPid = get('$targetserver_pid'),
-  gen_server:call(TargetserverPid, {update_pdict, get()}).
+    TargetserverPid = get('$targetserver_pid'),
+    gen_server:call(TargetserverPid, {update_pdict, get()}).
 
 -spec update_pdict([atom()]) -> ok.
 update_pdict(Keys) ->
-  update_pdict(Keys, []).
+    update_pdict(Keys, []).
 
 update_pdict([], KVs) ->
-  TargetserverPid = get('$targetserver_pid'),
-  gen_server:call(TargetserverPid, {update_pdict, KVs});
+    TargetserverPid = get('$targetserver_pid'),
+    gen_server:call(TargetserverPid, {update_pdict, KVs});
 update_pdict([Key | Keys], KVs) ->
-  update_pdict(Keys, [{Key, get(Key)} | KVs]).
+    update_pdict(Keys, [{Key, get(Key)} | KVs]).
 
 %% @doc Initialize the target of the strategy.
 
 -spec init_target(proper_types:type()) -> ok.
 init_target(RawType) ->
-  update_pdict(['$left', '$size']),
-  Type = proper_types:cook_outer(RawType),
-  TargetserverPid = get('$targetserver_pid'),
-  safe_call(TargetserverPid, {init_target, Type}).
+    update_pdict(['$left', '$size']),
+    Type = proper_types:cook_outer(RawType),
+    TargetserverPid = get('$targetserver_pid'),
+    safe_call(TargetserverPid, {init_target, Type}).
 
 %% This produces the next gen instance from the next
 %% generator provided by the strategy. It will also
@@ -200,21 +200,21 @@ init_target(RawType) ->
 %% @private
 -spec targeted_gen() -> any().
 targeted_gen() ->
-  update_pdict(['$left', '$size']),
-  TargetserverPid = get('$targetserver_pid'),
-  gen_server:call(TargetserverPid, gen).
+    update_pdict(['$left', '$size']),
+    TargetserverPid = get('$targetserver_pid'),
+    gen_server:call(TargetserverPid, gen).
 
 %% @doc Get the shrinker for a Type.
 
 -spec get_shrinker(proper_types:type()) -> proper_types:type().
 get_shrinker(Type) ->
-  TargetserverPid = get('$targetserver_pid'),
-  try
-    gen_server:call(TargetserverPid, shrinker)
-  catch
-    _:{noproc, _} ->
-      Type
-  end.
+    TargetserverPid = get('$targetserver_pid'),
+    try
+        gen_server:call(TargetserverPid, shrinker)
+    catch
+        _:{noproc, _} ->
+            Type
+    end.
 
 %% This is used to update the fitness value.
 %% Depending on the strategy and the fitness this
@@ -223,9 +223,9 @@ get_shrinker(Type) ->
 %% @private
 -spec update_uv(fitness(), threshold()) -> boolean().
 update_uv(Fitness, Threshold) ->
-  TargetserverPid = get('$targetserver_pid'),
-  safe_call(TargetserverPid, {update_fitness, Fitness}),
-  check_threshold(Threshold, Fitness).
+    TargetserverPid = get('$targetserver_pid'),
+    safe_call(TargetserverPid, {update_fitness, Fitness}),
+    check_threshold(Threshold, Fitness).
 
 %% @doc Reset the strategy target and data to a random
 %% initial value. Useful when the generated instances
@@ -233,8 +233,8 @@ update_uv(Fitness, Threshold) ->
 
 -spec reset() -> ok.
 reset() ->
-  TargetserverPid = get('$targetserver_pid'),
-  safe_call(TargetserverPid, reset).
+    TargetserverPid = get('$targetserver_pid'),
+    safe_call(TargetserverPid, reset).
 
 %% Create a safe call to a gen_server in case it
 %% raises noproc. Τhis should only be used for
@@ -243,31 +243,31 @@ reset() ->
 %% @private
 -spec safe_call(pid(), term()) -> term().
 safe_call(Pid, Call) ->
-  try
-    gen_server:call(Pid, Call)
-  catch
-    _:{noproc, _} ->
-      ok
-  end.
+    try
+        gen_server:call(Pid, Call)
+    catch
+        _:{noproc, _} ->
+            ok
+    end.
 
 %% @private
 check_threshold(Threshold, Fitness) ->
-  case Threshold of
-    inf -> true;
-    _ -> Fitness < Threshold
-  end.
+    case Threshold of
+        inf -> true;
+        _ -> Fitness < Threshold
+    end.
 
 %% @private
 strategy(Strat) ->
-  case Strat of
-    simulated_annealing ->
-      proper_sa;
-    hill_climbing ->
-      put(target_sa_acceptfunc, hillclimbing),
-      proper_sa;
-    _ ->
-      Strat
-  end.
+    case Strat of
+        simulated_annealing ->
+            proper_sa;
+        hill_climbing ->
+            put(target_sa_acceptfunc, hillclimbing),
+            proper_sa;
+        _ ->
+            Strat
+    end.
 
 %% -----------------------------------------------------------------------------
 %% gen_server callbacks
@@ -276,65 +276,65 @@ strategy(Strat) ->
 %% @private
 -spec init(Args :: [{strategy(), strategy_data()}]) -> {ok, state()}.
 init([{Strategy, Data}]) ->
-  {ok, #state{strategy = Strategy, data = Data}}.
+    {ok, #state{strategy = Strategy, data = Data}}.
 
 %% @private
 -spec handle_call(Request :: term(), From :: {pid(), Tag :: term()},
                   State :: state()) ->
-        {reply, Reply :: term(), NewState :: state()}.
+          {reply, Reply :: term(), NewState :: state()}.
 handle_call(gen, _From, State) ->
-  #state{strategy = Strat, target = Target, data = Data} = State,
-  {NextValue, NewTarget, NewData} = Strat:next(Target, Data),
-  {reply, NextValue, State#state{target = NewTarget, data = NewData}};
+    #state{strategy = Strat, target = Target, data = Data} = State,
+    {NextValue, NewTarget, NewData} = Strat:next(Target, Data),
+    {reply, NextValue, State#state{target = NewTarget, data = NewData}};
 
 handle_call(shrinker, _From, State) ->
-  #state{strategy = Strat, target = Target, data = Data} = State,
-  Shrinker = Strat:get_shrinker(Target, Data),
-  {reply, Shrinker, State};
+    #state{strategy = Strat, target = Target, data = Data} = State,
+    Shrinker = Strat:get_shrinker(Target, Data),
+    {reply, Shrinker, State};
 
 handle_call({init_target, Type}, _From, State) ->
-  #state{strategy = Strat} = State,
-  NextFun = proper_gen_next:from_proper_generator(Type),
-  NewTarget = Strat:init_target(Type, NextFun),
-  {reply, ok, State#state{target = NewTarget}};
+    #state{strategy = Strat} = State,
+    NextFun = proper_gen_next:from_proper_generator(Type),
+    NewTarget = Strat:init_target(Type, NextFun),
+    {reply, ok, State#state{target = NewTarget}};
 
 handle_call({update_pdict, KVs}, _From, State) ->
-  lists:foreach(fun ({K, V}) -> put(K, V) end, KVs),
-  {reply, ok, State};
+    lists:foreach(fun ({K, V}) -> put(K, V) end, KVs),
+    {reply, ok, State};
 
 handle_call({update_fitness, Fitness}, _From, State) ->
-  #state{strategy = Strat, target = Target, data = Data} = State,
-  {NewTarget, NewData} = Strat:update_fitness(Fitness, Target, Data),
-  {reply, ok, State#state{target = NewTarget, data = NewData}};
+    #state{strategy = Strat, target = Target, data = Data} = State,
+    {NewTarget, NewData} = Strat:update_fitness(Fitness, Target, Data),
+    {reply, ok, State#state{target = NewTarget, data = NewData}};
 
 handle_call(reset, _From, State) ->
-  #state{strategy = Strat, target = Target, data = Data} = State,
-  {NewTarget, NewData} = Strat:reset(Target, Data),
-  {reply, ok, State#state{target = NewTarget, data = NewData}}.
+    #state{strategy = Strat, target = Target, data = Data} = State,
+    {NewTarget, NewData} = Strat:reset(Target, Data),
+    {reply, ok, State#state{target = NewTarget, data = NewData}}.
 
 %% @private
 -spec handle_cast(Request :: term(), State :: state()) ->
-        {noreply, NewState :: term()}.
+          {noreply, NewState :: term()}.
 handle_cast(_Request, State) ->
-  {noreply, State}.
+    {noreply, State}.
 
 %% @private
 -spec handle_info(Info :: timeout | term(), State :: state()) ->
-        {noreply, NewState :: state()}.
+          {noreply, NewState :: state()}.
 handle_info(_Info, State) ->
-  {noreply, State}.
+    {noreply, State}.
 
 %% @private
 -spec terminate(Reason :: (normal | shutdown | {shutdown, term()} |
                            term()),
                 State :: state()) ->
-        ok.
+          ok.
 terminate(_Reason, _State) ->
-  ok.
+    ok.
 
 %% @private
 -spec code_change(OldVsn :: (term() | {down, term()}), State :: state(),
                   Extra :: term()) ->
-        {ok, NewState :: state()}.
+          {ok, NewState :: state()}.
 code_change(_OldVsn, State, _Extra) ->
-  {ok, State}.
+    {ok, State}.

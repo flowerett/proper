@@ -42,75 +42,75 @@ no_duplicates(L) ->
 
 prop_index() ->
     ?FORALL(List, ne_nd_list(integer()),
-	    ?FORALL(X, union(List),
-		    lists:nth(proper_statem:index(X, List), List) =:= X)).
+            ?FORALL(X, union(List),
+                    lists:nth(proper_statem:index(X, List), List) =:= X)).
 
 prop_all_insertions() ->
     ?FORALL(List, list(integer()),
-	    begin
-		Len = length(List),
-		?FORALL(Limit, range(1,Len+1),
-			?FORALL(X, integer(),
-				begin
-				    AllIns = proper_statem:all_insertions(X, Limit, List),
-				    length(AllIns) =:= Limit
-				end))
-	    end).
+            begin
+                Len = length(List),
+                ?FORALL(Limit, range(1,Len+1),
+                        ?FORALL(X, integer(),
+                                begin
+                                    AllIns = proper_statem:all_insertions(X, Limit, List),
+                                    length(AllIns) =:= Limit
+                                end))
+            end).
 
 prop_insert_all() ->
     ?FORALL(List, short_ne_nd_list(integer()),
-	    begin
-		Len = length(List),
-		{L1, L2} = lists:split(Len div 2, List),
-		AllIns = proper_statem:insert_all(L1, L2),
-		?WHENFAIL(io:format("~nList: ~w, L1: ~w, L2: ~w~nAllIns: ~w~n",
-				    [List,L1,L2,AllIns]),
-			  lists:all(fun(L) ->
-					    length(L) =:= Len andalso
-						no_duplicates(L) andalso
-						lists:subtract(L,L2) =:= L1
-				    end, AllIns))
-	    end).
+            begin
+                Len = length(List),
+                {L1, L2} = lists:split(Len div 2, List),
+                AllIns = proper_statem:insert_all(L1, L2),
+                ?WHENFAIL(io:format("~nList: ~w, L1: ~w, L2: ~w~nAllIns: ~w~n",
+                                    [List,L1,L2,AllIns]),
+                          lists:all(fun(L) ->
+                                            length(L) =:= Len andalso
+                                                no_duplicates(L) andalso
+                                                lists:subtract(L,L2) =:= L1
+                                    end, AllIns))
+            end).
 
 prop_zip() ->
     ?FORALL({X, Y}, {list(), list()},
-	    begin
-		LenX = length(X),
-		LenY = length(Y),
-		Res = if LenX < LenY ->
-			      lists:zip(X, lists:sublist(Y, LenX));
-			 LenX =:= LenY ->
-			      lists:zip(X, Y);
-			 LenX > LenY ->
-			      lists:zip(lists:sublist(X, LenY), Y)
-		      end,
-		equals(zip(X, Y), Res)
-	    end).
+            begin
+                LenX = length(X),
+                LenY = length(Y),
+                Res = if LenX < LenY ->
+                              lists:zip(X, lists:sublist(Y, LenX));
+                         LenX =:= LenY ->
+                              lists:zip(X, Y);
+                         LenX > LenY ->
+                              lists:zip(lists:sublist(X, LenY), Y)
+                      end,
+                equals(zip(X, Y), Res)
+            end).
 
 prop_state_after() ->
     ?FORALL(Cmds, proper_statem:commands(?MOD1),
-	    begin
-		SymbState = proper_statem:state_after(?MOD1, Cmds),
-		{_, S, ok} = proper_statem:run_commands(?MOD1, Cmds),
-		?MOD1:clean_up(),
-		equals(proper_symb:eval(SymbState), S)
-	    end).
+            begin
+                SymbState = proper_statem:state_after(?MOD1, Cmds),
+                {_, S, ok} = proper_statem:run_commands(?MOD1, Cmds),
+                ?MOD1:clean_up(),
+                equals(proper_symb:eval(SymbState), S)
+            end).
 
 prop_parallel_ets_counter() ->
     ?FORALL({_Seq, [P1, P2]}, proper_statem:parallel_commands(?MOD),
-	    begin
-		Len1 = length(P1),
-		Len2 = length(P2),
-		Len1 =:= Len2 orelse (Len1 + 1) =:= Len2
-	    end).
+            begin
+                Len1 = length(P1),
+                Len2 = length(P2),
+                Len1 =:= Len2 orelse (Len1 + 1) =:= Len2
+            end).
 
 prop_check_true() ->
     ?FORALL({Seq, Par}, proper_statem:parallel_commands(?MOD),
-	    begin
-		?MOD:clean_up(),
-		?MOD:set_up(),
-		{{_, State, ok}, Env} = proper_statem:run(?MOD, Seq, []),
-		Res = [proper_statem:execute(C, Env, ?MOD) || C <- Par],
-		V = proper_statem:check(?MOD, State, Env, false, [], Res),
-		equals(V, true)
-	    end).
+            begin
+                ?MOD:clean_up(),
+                ?MOD:set_up(),
+                {{_, State, ok}, Env} = proper_statem:run(?MOD, Seq, []),
+                Res = [proper_statem:execute(C, Env, ?MOD) || C <- Par],
+                V = proper_statem:check(?MOD, State, Env, false, [], Res),
+                equals(V, true)
+            end).

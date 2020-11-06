@@ -24,19 +24,19 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module contains helper arithmetic, list handling and random
-%%%	 functions.
+%%%      functions.
 %%% @private
 
 -module(proper_arith).
 
 -export([list_remove/2, list_update/3, list_insert/3, safe_map/2, %safe_foldl/3,
-	 safe_any/2, safe_zip/2, tuple_map/2, cut_improper_tail/1,
-	 head_length/1, find_first/2, filter/2, partition/2, insert/3,%remove/2,
-	 unflatten/2]).
+         safe_any/2, safe_zip/2, tuple_map/2, cut_improper_tail/1,
+         head_length/1, find_first/2, filter/2, partition/2, insert/3,%remove/2,
+         unflatten/2]).
 -export([rand_start/1, rand_restart/1, rand_reseed/0, rand_stop/0,
-	 rand_int/1, rand_int/2, smart_rand_int/3, rand_non_neg_int/1,
-	 rand_float/1, rand_float/2, rand_non_neg_float/1,
-	 distribute/2, jumble/1, rand_choose/1, freq_choose/1]).
+         rand_int/1, rand_int/2, smart_rand_int/3, rand_non_neg_int/1,
+         rand_float/1, rand_float/2, rand_non_neg_float/1,
+         distribute/2, jumble/1, rand_choose/1, freq_choose/1]).
 
 -include("proper_internal.hrl").
 
@@ -60,15 +60,15 @@ list_insert(Index, Elem, List) ->
     H ++ [Elem] ++ T.
 
 %% TODO: safe_map and cut_improper_tail can be combined into one generic list-
-%%	 recursing function, with 3 function arguments: apply_to_proper_elems,
-%%	 apply_to_improper_tail, combine
+%%       recursing function, with 3 function arguments: apply_to_proper_elems,
+%%       apply_to_improper_tail, combine
 -spec safe_map(fun((T) -> S), maybe_improper_list(T,T | [])) ->
-	  maybe_improper_list(S,S | []).
+          maybe_improper_list(S,S | []).
 safe_map(Fun, List) ->
     safe_map_tr(Fun, List, []).
 
 -spec safe_map_tr(fun((T) -> S), maybe_improper_list(T,T | []) | T, [S]) ->
-	  maybe_improper_list(S,S | []).
+          maybe_improper_list(S,S | []).
 safe_map_tr(_Fun, [], AccList) ->
     lists:reverse(AccList);
 safe_map_tr(Fun, [Head | Tail], AccList) ->
@@ -85,7 +85,7 @@ safe_map_tr(Fun, ImproperTail, AccList) ->
 %%     Fun(ImproperTail, Acc).
 
 -spec safe_any(fun((T) -> boolean()), maybe_improper_list(T,T | [])) ->
-	  boolean().
+          boolean().
 safe_any(_Pred, []) ->
     false;
 safe_any(Pred, [X | Rest]) ->
@@ -114,7 +114,7 @@ cut_improper_tail(List) ->
     cut_improper_tail_tr(List, []).
 
 -spec cut_improper_tail_tr(maybe_improper_list(T,T | []) | T, [T]) ->
-	  [T] | {[T],T}.
+          [T] | {[T],T}.
 cut_improper_tail_tr([], AccList) ->
     lists:reverse(AccList);
 cut_improper_tail_tr([Head | Tail], AccList) ->
@@ -127,7 +127,7 @@ head_length(List) ->
     head_length_tr(List, 0).
 
 -spec head_length_tr(nonempty_improper_list(term(),term()) | term(),
-		     non_neg_integer()) -> pos_integer().
+                     non_neg_integer()) -> pos_integer().
 head_length_tr([_Head | Tail], Len) ->
     head_length_tr(Tail, Len + 1);
 head_length_tr(_ImproperTail, Len) ->
@@ -138,13 +138,13 @@ find_first(Pred, List) ->
     find_first_tr(Pred, List, 1).
 
 -spec find_first_tr(fun((T) -> boolean()), [T], position()) ->
-	  {position(),T} | 'none'.
+          {position(),T} | 'none'.
 find_first_tr(_Pred, [], _Pos) ->
     none;
 find_first_tr(Pred, [X | Rest], Pos) ->
     case Pred(X) of
-	true  -> {Pos, X};
-	false -> find_first_tr(Pred, Rest, Pos + 1)
+        true  -> {Pos, X};
+        false -> find_first_tr(Pred, Rest, Pos + 1)
     end.
 
 -spec filter(fun((T) -> boolean()), [T]) -> {[T],[position()]}.
@@ -152,34 +152,34 @@ filter(Pred, List) ->
     filter_tr(Pred, lists:reverse(List), length(List), [], []).
 
 -spec filter_tr(fun((T) -> boolean()), [T], position(), [T], [position()]) ->
-	  {[T], [position()]}.
+          {[T], [position()]}.
 filter_tr(_Pred, [], _Pos, Trues, TrueLookup) ->
     {Trues, TrueLookup};
 filter_tr(Pred, [X | Rest], Pos, Trues, TrueLookup) ->
     case Pred(X) of
-	true ->
-	    filter_tr(Pred, Rest, Pos - 1, [X | Trues], [Pos | TrueLookup]);
-	false ->
-	    filter_tr(Pred, Rest, Pos - 1, Trues, TrueLookup)
+        true ->
+            filter_tr(Pred, Rest, Pos - 1, [X | Trues], [Pos | TrueLookup]);
+        false ->
+            filter_tr(Pred, Rest, Pos - 1, Trues, TrueLookup)
     end.
 
 -spec partition(fun((T) -> boolean()), [T]) ->
-	  {[T], [position()], [T], [position()]}.
+          {[T], [position()], [T], [position()]}.
 partition(Pred, List) ->
     partition_tr(Pred, lists:reverse(List), length(List), [], [], [], []).
 
 -spec partition_tr(fun((T) -> boolean()), [T], position(), [T], [position()],
-		   [T], [position()]) -> {[T],[position()],[T],[position()]}.
+                   [T], [position()]) -> {[T],[position()],[T],[position()]}.
 partition_tr(_Pred, [], _Pos, Trues, TrueLookup, Falses, FalseLookup) ->
     {Trues, TrueLookup, Falses, FalseLookup};
 partition_tr(Pred, [X | Rest], Pos, Trues, TrueLookup, Falses, FalseLookup) ->
     case Pred(X) of
-	true ->
-	    partition_tr(Pred, Rest, Pos - 1, [X | Trues], [Pos | TrueLookup],
-			 Falses, FalseLookup);
-	false ->
-	    partition_tr(Pred, Rest, Pos - 1, Trues, TrueLookup, [X | Falses],
-			 [Pos | FalseLookup])
+        true ->
+            partition_tr(Pred, Rest, Pos - 1, [X | Trues], [Pos | TrueLookup],
+                         Falses, FalseLookup);
+        false ->
+            partition_tr(Pred, Rest, Pos - 1, Trues, TrueLookup, [X | Falses],
+                         [Pos | FalseLookup])
     end.
 
 -spec insert([T], [position()], [T]) -> [T].
@@ -258,12 +258,12 @@ rand_non_neg_int(Const) ->
     trunc(rand_non_neg_float(Const)).
 
 -spec bounded_rand_non_neg_int(non_neg_integer(), non_neg_integer()) ->
-	  non_neg_integer().
+          non_neg_integer().
 bounded_rand_non_neg_int(Const, Lim) when is_integer(Lim), Lim >= 0 ->
     X = rand_non_neg_int(Const),
     case X > Lim of
-	true  -> bounded_rand_non_neg_int(Const, Lim);
-	false -> X
+        true  -> bounded_rand_non_neg_int(Const, Lim);
+        false -> X
     end.
 
 -spec rand_int(integer(), integer()) -> integer().
@@ -275,35 +275,35 @@ rand_int(Low, High) when is_integer(Low), is_integer(High), Low =< High ->
 -spec smart_rand_int(non_neg_integer(), integer(), integer()) -> integer().
 smart_rand_int(Const, Low, High) ->
     case High - Low =< ?SMALL_RANGE_THRESHOLD of
-	true  -> rand_int(Low, High);
-	false -> wide_range_rand_int(Const, Low, High)
+        true  -> rand_int(Low, High);
+        false -> wide_range_rand_int(Const, Low, High)
     end.
 
 -spec wide_range_rand_int(non_neg_integer(), integer(), integer()) ->
-	  integer().
+          integer().
 wide_range_rand_int(Const, Low, High) when Low >= 0 ->
     Low + bounded_rand_non_neg_int(Const, High - Low);
 wide_range_rand_int(Const, Low, High) when High =< 0 ->
     High - bounded_rand_non_neg_int(Const, High - Low);
 wide_range_rand_int(Const, Low, High) ->
     case ?RANDOM_MOD:uniform(2) of
-	1 -> smart_rand_int(Const, 0, High);
-	2 -> smart_rand_int(Const, Low, 0)
+        1 -> smart_rand_int(Const, 0, High);
+        2 -> smart_rand_int(Const, Low, 0)
     end.
 
 -spec rand_float(non_neg_integer()) -> float().
 rand_float(Const) ->
     X = rand_non_neg_float(Const),
     case ?RANDOM_MOD:uniform(2) of
-	1 -> X;
-	2 -> -X
+        1 -> X;
+        2 -> -X
     end.
 
 -spec rand_non_neg_float(non_neg_integer()) -> float().
 rand_non_neg_float(Const) when is_integer(Const), Const >= 0 ->
     case ?RANDOM_MOD:uniform() of
-	1.0 -> rand_non_neg_float(Const);
-	X   -> Const * zero_one_to_zero_inf(X)
+        1.0 -> rand_non_neg_float(Const);
+        X   -> Const * zero_one_to_zero_inf(X)
     end.
 
 -spec rand_float(float(), float()) -> float().
@@ -324,7 +324,7 @@ distribute(Credits, People) ->
     jumble(distribute_tr(Credits, People, [])).
 
 -spec distribute_tr(non_neg_integer(), pos_integer(), [non_neg_integer()]) ->
-	  [non_neg_integer()].
+          [non_neg_integer()].
 distribute_tr(0, PeopleLeft, AccList) ->
     lists:duplicate(PeopleLeft, 0) ++ AccList;
 distribute_tr(CreditsLeft, 1, AccList) ->
@@ -350,11 +350,11 @@ freq_choose(Choices) when Choices =/= []  ->
     freq_select(rand_int(1, SumFreq), Choices, 1).
 
 -spec freq_select(proper_types:frequency(), [{proper_types:frequency(),T}],
-		  position()) -> {position(),T}.
+                  position()) -> {position(),T}.
 freq_select(N, [{Freq,Choice} | Rest], Pos) ->
     case N =< Freq of
-	true ->
-	    {Pos,Choice};
-	false ->
-	    freq_select(N - Freq, Rest, Pos + 1)
+        true ->
+            {Pos,Choice};
+        false ->
+            freq_select(N - Freq, Rest, Pos + 1)
     end.

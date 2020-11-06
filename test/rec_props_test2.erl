@@ -24,7 +24,7 @@
 %%% @version {@version}
 %%% @author Manolis Papadakis
 %%% @doc This module tests whether the parse transform can read module
-%%%	 information from source.
+%%%      information from source.
 
 -module(rec_props_test2).
 -export_type([exp2/0]).
